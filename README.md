@@ -1,6 +1,6 @@
 # rcrly
 
-![Recurly Logo](resources/images/recurly-logo-small.png")
+<img src="resources/images/recurly-logo-small.png.png" />
 
 *An Erlang/LFE REST API Client for the Recurly Billing Service*
 
@@ -10,7 +10,7 @@
 * [Installation](#installation-)
 * [Usage](#usage-)
   * [Configuration](#configuration-)
-  * [Starting rcrly](#starting---rcrly---)
+  * [Starting rcrly](#starting-rcrly-)
   * [Authentication](#authentication-)
   * [API Calls](#api-calls-)
     * [From LFE](#from-lfe-)
