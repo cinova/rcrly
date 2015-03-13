@@ -17,10 +17,11 @@
     * [From Erlang](#from-erlang-)
   * [Handling Errors](#handling-errors-)
   * [Logging](#loggin-)
-  
+
+
 ## Introduction [&#x219F;](#table-of-contents)
 
-Add content to me here!
+TBD
 
 
 ## Installation [&#x219F;](#table-of-contents)
@@ -69,11 +70,37 @@ TBD
 
 ### API Calls [&#x219F;](#table-of-contents)
 
-TBD
+This ``README`` won't document all the API calls availale with the service, as
+that is already done by Recurly [here](https://docs.recurly.com/api/).
+However, see below for some example usage to get starting using ``rcrly``
+quickly.
 
 ### From LFE [&#x219F;](#table-of-contents)
 
-TBD
+```lisp
+> (rcrly:start)
+(#(inets ok) #(ssl ok) #(lhttpc ok))
+> (rcrly:get "/accounts")
+(#(status #(200 "OK"))
+ #(headers
+   (#("strict-transport-security" "max-age=15768000; includeSubDomains")
+    #("x-request-id" "ac2vfg1lpbu2ofbkn900")
+    #("cache-control" "max-age=0, private, must-revalidate")
+    #("etag" "\"d41d8cd98f00b204e9800998ecf8427e\"")
+    #("x-records" "0")
+    #("x-ratelimit-reset" "1426286160")
+    #("x-ratelimit-remaining" "1999")
+    #("x-ratelimit-limit" "2000")
+    #("content-language" "en-US")
+    #("vary" "Accept-Encoding")
+    #("connection" "close")
+    #("transfer-encoding" "chunked")
+    #("content-type" "application/xml; charset=utf-8")
+    #("date" "Fri, 13 Mar 2015 22:31:51 GMT")
+    #("server" "blackhole")))
+ #(body
+   #B(60 63 120 109 108 32 118 101 114 115 105 111 110 61 34 49 46 ...)))
+```
 
 ### From Erlang [&#x219F;](#table-of-contents)
 
