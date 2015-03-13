@@ -1,5 +1,7 @@
 # rcrly
 
+![Recurly Logo](resources/images/recurly-logo-small.png")
+
 *An Erlang/LFE REST API Client for the Recurly Billing Service*
 
 ## Table of Contents
