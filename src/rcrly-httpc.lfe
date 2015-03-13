@@ -34,10 +34,17 @@
   ((`#(ok #(,status ,headers ,body)))
     `(#(status ,status)
       #(headers ,headers)
-      #(body ,body)))
+      #(body ,(parse-body-xml body))))
   (((= `#(error ,_) error))
    ;; XXX let's find a good error and use that to refine this one
    error))
+
+(defun parse-body-xml
+  ((`#(ok ,parsed "\n"))
+   parsed)
+  ((body)
+   (parse-body-xml
+     (erlsom:simple_form body))))
 
 (defun make-default-headers ()
   `(#("Accept" "application/xml")

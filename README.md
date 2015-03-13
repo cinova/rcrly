@@ -82,7 +82,7 @@ quickly.
 ```lisp
 > (rcrly:start)
 (#(inets ok) #(ssl ok) #(lhttpc ok))
-> (rcrly:get "/accounts")
+> (set data (rcrly:get "/accounts"))
 (#(status #(200 "OK"))
  #(headers
    (#("strict-transport-security" "max-age=15768000; includeSubDomains")
@@ -100,8 +100,10 @@ quickly.
     #("content-type" "application/xml; charset=utf-8")
     #("date" "Fri, 13 Mar 2015 22:31:51 GMT")
     #("server" "blackhole")))
- #(body
-   #B(60 63 120 109 108 32 118 101 114 115 105 111 110 61 34 49 46 ...)))
+ #(body #("accounts" (#("type" "array")) ())))
+> (proplists:get_value 'body data)
+#("accounts" (#("type" "array")) ())
+  
 ```
 
 ### From Erlang [&#x219F;](#table-of-contents)
