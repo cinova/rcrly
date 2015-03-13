@@ -1,12 +1,24 @@
 # rcrly
 
+*An Erlang/LFE REST API Client for the Recurly Billing Service*
 
-## Introduction
+## Table of Contents
+
+* [Introduction](#introduction-)
+* [Installation](#installation-)
+* [Usage](#usage-)
+  * [Configuration](#configuration-)
+  * [Authentication](#authentication-)
+  * [API Calls](#api-calls-)
+  * [Handling Errors](#handling-errors-)
+  * [Logging](#loggin-)
+  
+## Introduction [&#x219F;](#table-of-contents)
 
 Add content to me here!
 
 
-## Installation
+## Installation [&#x219F;](#table-of-contents)
 
 Just add it to your ``rebar.config`` deps:
 
@@ -26,6 +38,15 @@ And then do the usual:
 ```
 
 
-## Usage
+## Usage [&#x219F;](#table-of-contents)
 
-Add content to me here!
+### Configuration [&#x219F;](#table-of-contents)
+
+### Authentication [&#x219F;](#table-of-contents)
+
+### API Calls [&#x219F;](#table-of-contents)
+
+### Handling Errors [&#x219F;](#table-of-contents)
+
+### Logging [&#x219F;](#table-of-contents)
+
