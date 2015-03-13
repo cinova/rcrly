@@ -70,6 +70,8 @@ TBD
 
 ### API Calls [&#x219F;](#table-of-contents)
 
+[NOTE: This is a work in progress]
+
 This ``README`` won't document all the API calls availale with the service, as
 that is already done by Recurly [here](https://docs.recurly.com/api/).
 However, see below for some example usage to get starting using ``rcrly``
