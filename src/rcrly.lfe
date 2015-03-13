@@ -5,7 +5,7 @@
 
 (defun get-default-options ()
   (make-conn host (rcrly-cfg:get-host)
-             key (rcrly-cfg:get-key)
+             key (rcrly-cfg:get-api-key)
              default-currency (rcrly-cfg:get-default-currency)))
 
 (defun new ()

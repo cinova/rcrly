@@ -11,18 +11,28 @@
 
 ;;; Default configuration values, used as a last resort
 (defun host () "cinova.recurly.com")
-(defun key () "")
+(defun api-key () "")
 (defun default-currency () "USD")
 
 (defun get (key)
   "The wrapper for getting config info."
-  'noop)
+  ;; XXX add more here later
+  (os:getenv key))
 
-(defun get-key ()
-  'noop)
+(defun get (key default)
+  (let ((value (get key)))
+    (if (=:= value 'false)
+      default
+      value)))
+
+(defun get-api-key ()
+  (get "RECURLY_API_KEY"
+       (api-key)))
 
 (defun get-host ()
-  'noop)
+  (get "RECURLY_HOST"
+       (host)))
 
-(defun get-default-currench ()
-  'noop)
+(defun get-default-currency ()
+  (get "RECURLY_DEFAULT_CURRENCY"
+       (default-currency)))
