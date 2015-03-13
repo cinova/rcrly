@@ -1,4 +1,4 @@
-(defmodule unit-recurly-tests
+(defmodule unit-rcrly-tests
   (behaviour ltest-unit)
   (export all)
   (import
@@ -9,4 +9,4 @@
 (include-lib "ltest/include/ltest-macros.lfe")
 
 (deftest my-adder
-  (is-equal 4 (: recurly my-adder 2 2)))
+  (is-equal 4 (: rcrly my-adder 2 2)))

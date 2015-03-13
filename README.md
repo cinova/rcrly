@@ -1,4 +1,4 @@
-# recurly
+# rcrly
 
 
 ## Introduction
@@ -13,8 +13,8 @@ Just add it to your ``rebar.config`` deps:
 ```erlang
   {deps, [
     ...
-    {recurly, ".*",
-      {git, "git@github.com:YOURNAME/recurly.git", "master"}}
+    {rcrly, ".*",
+      {git, "git@github.com:cinova/rcrly.git", "master"}}
       ]}.
 ```
 
