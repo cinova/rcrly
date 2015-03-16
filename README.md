@@ -68,6 +68,7 @@ you will want to start ``rcrly`` when your application starts.
 
 TBD
 
+
 ### API Calls [&#x219F;](#table-of-contents)
 
 [NOTE: This is a work in progress]
@@ -76,6 +77,7 @@ This ``README`` won't document all the API calls availale with the service, as
 that is already done by Recurly [here](https://docs.recurly.com/api/).
 However, see below for some example usage to get starting using ``rcrly``
 quickly.
+
 
 ### From LFE [&#x219F;](#table-of-contents)
 
@@ -100,19 +102,39 @@ quickly.
     #("content-type" "application/xml; charset=utf-8")
     #("date" "Fri, 13 Mar 2015 22:31:51 GMT")
     #("server" "blackhole")))
- #(body #("accounts" (#("type" "array")) ())))
+ #(body
+   (#(tag "accounts") #(attr (#("type" "array"))) #(content ()) #(tail "\n"))))
 > (proplists:get_value 'body data)
-#("accounts" (#("type" "array")) ())
+(#(tag "accounts") #(attr (#("type" "array"))) #(content ()) #(tail "\n"))
   
 ```
+
+The rcrly client supports the following options which may be passed as
+an optional argument (as a property list) to ``get`` and ``post``
+functions:
+* ``batch-size`` - an integer between 1 and 200 representing the number of
+  results returned in the Recurlt service responses
+
+General HTTP client options which may be passed in the same property list
+as the rcrly options. lhttpc will understand the following options:
+* ``connect_options`` - a list of terms
+* ``send_retry`` - an integer
+* ``partial_upload`` - an integer (window size)
+* ``partial_download`` - a list of one or both of ``#(window_size N)`` and ``#(part_size N)``
+* ``proxy`` - a URL string
+* ``proxy_ssl_options`` - a list of terms
+* ``pool`` - pid or atom
+
 
 ### From Erlang [&#x219F;](#table-of-contents)
 
 TBD
 
+
 ### Handling Errors [&#x219F;](#table-of-contents)
 
 TBD
+
 
 ### Logging [&#x219F;](#table-of-contents)
 

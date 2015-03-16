@@ -15,10 +15,24 @@
   connection-options)
 
 (defun get (endpoint)
-  (rcrly-httpc:request endpoint "GET" ""))
+  (get endpoint '()))
+
+(defun get (endpoint client-options)
+  (rcrly-httpc:request
+    endpoint
+    "GET"
+    ""
+    client-options))
 
 (defun post (endpoint data)
-  (rcrly-httpc:request endpoint "POST" data))
+  (post endpoint data '()))
+
+(defun post (endpoint data client-options)
+  (rcrly-httpc:request
+    endpoint
+    "POST"
+    data
+    client-options))
 
 (defun get-default-options ()
   (make-conn host (rcrly-cfg:get-host)
