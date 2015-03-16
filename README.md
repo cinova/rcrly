@@ -48,7 +48,14 @@ And then do the usual:
 
 ### Configuration [&#x219F;](#table-of-contents)
 
-TBD
+The following environment variables may be set to override default configuration
+in rcrly:
+
+* ``RECURLY_API_KEY``
+* ``RECURLY_HOST`` (e.g., ``yourname.recurly.com``)
+* ``RECURLY_DEFAULT_CURRENCY``
+* ``RECURLY_VERSION``
+* ``RECURLY_REQUEST_TIMEOUT``
 
 ### Starting ``rcrly`` [&#x219F;](#table-of-contents)
 
@@ -66,7 +73,15 @@ you will want to start ``rcrly`` when your application starts.
 
 ### Authentication [&#x219F;](#table-of-contents)
 
-TBD
+In your OS shell, export your Recurly API key and your subdomain, e.g.:
+
+```bash
+$ export RECURLY_API_KEY=GFEDCBA9876543210
+$ export RECURLY_HOST=yourco.recurly.com
+```
+
+When you run the REPL or start the application from your shell, this will be
+used to create the authentiction header in every call.
 
 
 ### API Calls [&#x219F;](#table-of-contents)
@@ -114,6 +129,7 @@ an optional argument (as a property list) to ``get`` and ``post``
 functions:
 * ``batch-size`` - an integer between 1 and 200 representing the number of
   results returned in the Recurlt service responses
+* ``return-type`` - either the atom ``lfe`` or ``xml``; ``lfe`` is the default
 
 General HTTP client options which may be passed in the same property list
 as the rcrly options. lhttpc will understand the following options:
