@@ -1,34 +1,49 @@
 (defmodule rcrly-httpc
   (export all))
 
-(defun request (endpoint method)
-  (request endpoint method ""))
+(defun request (endpoint method options)
+  (request endpoint method "" options))
 
-(defun request (endpoint method body)
+(defun request (endpoint method body options)
   (request endpoint
            method
            (make-default-headers)
-           body))
+           body
+           options))
 
-(defun request (endpoint method headers body)
+(defun request (endpoint method headers body options)
   (request endpoint
            method
            headers
            body
-           (rcrly-cfg:get-request-timeout)))
+           (rcrly-cfg:get-request-timeout)
+           options
+           '()))
 
-(defun request (endpoint method headers body timeout)
-  (request (make-url endpoint) method headers body timeout '()))
+(defun request (endpoint method headers body timeout options lhttpc-options)
+  (request-dispatch
+    (make-url endpoint)
+    method
+    headers
+    body
+    timeout
+    options
+    lhttpc-options))
 
-(defun request (url method headers body timeout _rcrly-state)
+(defun request-dispatch (url method headers body timeout options lhttpc-options)
   ;; lhttpc can bomb out on an error with an exit, thus killing the LFE shell;
   ;; as such, we wrap it in a (try ...)
-  (try
-      (response
-       (lhttpc:request url method headers body timeout '()))
-    (catch (('error type stacktrace)
-            ;; XXX this needs to be double-checked under various error conditions
-            (error `#(lhttpc ,type ,stacktrace))))))
+  (let ((return-type (proplists:get_value 'return-type options 'lfe)))
+    (try
+        (case return-type
+          ('lfe
+           (response
+            (lhttpc:request url method headers body timeout lhttpc-options)))
+          ('xml
+           (lhttpc:request url method headers body timeout lhttpc-options)))
+      (catch (('error type stacktrace)
+              ;; XXX this needs to be double-checked under various error conditions
+              (error `#(lhttpc ,type ,stacktrace)))))))
 
 (defun response
   ((`#(ok #(,status ,headers ,body)))
@@ -51,7 +66,7 @@
 
 (defun body-error-check
   ((`(#(tag "errors") ,_ ,content ,_) `#(,code ,msg))
-   (error #(code ,code message ,msg content) 'api-error))
+   (error `#(code ,code message ,msg content) 'api-error))
   ((parsed staus) parsed))
 
 (defun make-default-headers ()
