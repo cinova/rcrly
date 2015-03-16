@@ -7,22 +7,47 @@
 ## Table of Contents
 
 * [Introduction](#introduction-)
+  * [About Recurly](#about-recurly-)
+  * [The LFE Client Library](#the-lfe-client-library-)
 * [Installation](#installation-)
 * [Usage](#usage-)
   * [Configuration](#configuration-)
   * [Starting rcrly](#starting-rcrly-)
   * [Authentication](#authentication-)
-  * [API Calls](#api-calls-)
+  * [Making Calls](#making-calls-)
     * [From LFE](#from-lfe-)
     * [From Erlang](#from-erlang-)
+    * [Options](#options-)
+    * [The API](#the-api-)
+      * [Accounts](#accounts-)
+      * Adjustments
+      * Billing Info
+      * Coupons
+      * Coupon Redemptions
+      * Invoices
+      * Plans
+      * Plan Add-ons
+      * Subscriptions
+      * Transactions
+  * [Working with Results](#working-with-results-)
+    * [get-data](#get-data-)
+    * [get-in](#get-in-)
   * [Handling Errors](#handling-errors-)
   * [Logging](#loggin-)
 
 
 ## Introduction [&#x219F;](#table-of-contents)
 
-TBD
+### About Recurly [&#x219F;](#table-of-contents)
 
+From the Recurly [docs site](https://docs.recurly.com/):
+
+<blockquote>Recurly provides a complete recurring billing system designed to remove all the headaches from subscription billing. Whether you’ve integrated with our Hosted Payment Pages, Recurly.js embedded forms, or API, these documents will help manage your day-to-day billing.
+</blockquote>
+
+### The LFE Client Library [&#x219F;](#table-of-contents)
+
+TBD
 
 ## Installation [&#x219F;](#table-of-contents)
 
@@ -84,7 +109,7 @@ When you run the REPL or start the application from your shell, this will be
 used to create the authentiction header in every call.
 
 
-### API Calls [&#x219F;](#table-of-contents)
+### Making Calls [&#x219F;](#table-of-contents)
 
 [NOTE: This is a work in progress]
 
@@ -94,41 +119,65 @@ However, see below for some example usage to get starting using ``rcrly``
 quickly.
 
 
-### From LFE [&#x219F;](#table-of-contents)
+#### From LFE [&#x219F;](#table-of-contents)
+
+Calls from LFE are pretty standard:
 
 ```lisp
 > (rcrly:start)
 (#(inets ok) #(ssl ok) #(lhttpc ok))
-> (set data (rcrly:get "/accounts"))
+> (rcrly:get-accounts)
 (#(status #(200 "OK"))
- #(headers
-   (#("strict-transport-security" "max-age=15768000; includeSubDomains")
-    #("x-request-id" "ac2vfg1lpbu2ofbkn900")
-    #("cache-control" "max-age=0, private, must-revalidate")
-    #("etag" "\"d41d8cd98f00b204e9800998ecf8427e\"")
-    #("x-records" "0")
-    #("x-ratelimit-reset" "1426286160")
-    #("x-ratelimit-remaining" "1999")
-    #("x-ratelimit-limit" "2000")
-    #("content-language" "en-US")
-    #("vary" "Accept-Encoding")
-    #("connection" "close")
-    #("transfer-encoding" "chunked")
-    #("content-type" "application/xml; charset=utf-8")
-    #("date" "Fri, 13 Mar 2015 22:31:51 GMT")
-    #("server" "blackhole")))
- #(body
-   (#(tag "accounts") #(attr (#("type" "array"))) #(content ()) #(tail "\n"))))
-> (proplists:get_value 'body data)
-(#(tag "accounts") #(attr (#("type" "array"))) #(content ()) #(tail "\n"))
-  
+ #(headers ...)
+ #(body ...))
 ```
+
+If you started the LFE REPL using the rcrly ``Makefile``, e.g.:
+
+```bash
+$ make repl-no-deps
+```
+
+then rcrly was started automatically, and you don't need to call ``(rcrly:start)``.
+
+
+``response``, ``status``, ``headers``, and ``body`` are returned in all calls,
+since these are often used to make subsequent calls to the Recurly services.
+``response`` is useful for pattern matching against ``ok`` or ``error`` results;
+``status`` is useful for matching against specific HTTP response codes.
+
+
+#### From Erlang [&#x219F;](#table-of-contents)
+
+Through written in LFE, the rcrly API is 100% Erlang Core compatible. You use
+it just like any other Erlang library.
+
+When you start rcrly with the make target, the depenendent applications are
+started for you automatically:
+
+```bash
+$ make shell-no-deps
+```
+
+```erlang
+1> rcrly:start().
+[{inets,{error,{already_started,inets}}},
+ {ssl,{error,{already_started,ssl}}},
+ {lhttpc,{error,{already_started,lhttpc}}}]
+2> rcrly:'get-accounts'().
+[{response,ok},
+ {status,{200,"OK"}},
+ {headers,[...]},
+ {body,[{tag,"accounts"}, ...]}]
+```
+
+#### Options [&#x219F;](#table-of-contents)
 
 The rcrly client supports the following options which may be passed as
 an optional argument (as a property list) to ``get`` and ``post``
 functions:
-* ``batch-size`` - an integer between 1 and 200 representing the number of
-  results returned in the Recurlt service responses
+* ``batch-size`` - an integer between ``1`` and ``200`` representing the number of
+  results returned in the Recurly service responses
 * ``return-type`` - either the atom ``lfe`` or ``xml``; ``lfe`` is the default
 
 General HTTP client options which may be passed in the same property list
@@ -142,10 +191,39 @@ as the rcrly options. lhttpc will understand the following options:
 * ``pool`` - pid or atom
 
 
-### From Erlang [&#x219F;](#table-of-contents)
+#### The API [&#x219F;](#table-of-contents)
+
+##### Accounts [&#x219F;](#table-of-contents)
 
 TBD
 
+
+### Working with Results [&#x219F;](#table-of-contents)
+
+#### ``get-data`` [&#x219F;](#table-of-contents)
+
+The ``get-data`` utility function is provided in the ``rcrly`` module and is
+useful for extracing response data from the data structure that is returned
+in most rcrly client results. For example:
+
+```lisp
+> (set results (rcrly:get-accounts))
+(#(response ok)
+ #(status #(200 "OK"))
+ #(headers ...)
+ #(body ...))
+> (set data (rcrly:get-data results))
+(#("account" ...)
+ #("account" ...))
+```
+
+Though this is useful, you may find that you use the ``rcrly:get-in`` more,
+instead.
+
+
+#### ``get-in`` [&#x219F;](#table-of-contents)
+
+TBD
 
 ### Handling Errors [&#x219F;](#table-of-contents)
 
