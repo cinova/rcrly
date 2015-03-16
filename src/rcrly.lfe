@@ -14,6 +14,8 @@
 (defun new (connection-options)
   connection-options)
 
+;;; Convenience client functions
+
 (defun get (endpoint)
   (get endpoint '()))
 
@@ -33,6 +35,20 @@
     "POST"
     data
     client-options))
+
+;;; API functions
+
+(defun get-accounts ()
+  (get "/accounts"))
+
+(defun get-accounts (client-options)
+  (get "/accounts" client-options))
+
+(defun get-account (id)
+  (get (++ "/accounts/"
+           (rcrly-util:arg->str id))))
+
+;;; Utility functions for this module
 
 (defun get-default-options ()
   (make-conn host (rcrly-cfg:get-host)
