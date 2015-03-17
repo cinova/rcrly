@@ -55,9 +55,9 @@
   (((= (cons first-key rest-keys) keys)
     (= (cons first-data rest-data) data))
    (cond ((=:= (size first-data) 3)
-          (get-in-three-tuple keys data))
+          (get-in-3tuple keys data))
          ((=:= (size first-data) 2)
-          (get-in-three-tuple
+          (get-in-3tuple
             rest-keys
             (element 2 (lists:keyfind first-key 1 data)))))))
 
@@ -70,7 +70,7 @@
   ((all)
    all))
 
-(defun get-in-three-tuple (keys data)
+(defun get-in-3tuple (keys data)
   (lists:foldl #'find/2 data keys))
 
 (defun find (key data)
