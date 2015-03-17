@@ -2,7 +2,7 @@
 
 <img src="resources/images/recurly-logo-small.png" />
 
-*An Erlang/LFE REST API Client for the Recurly Billing Service*
+*An Erlang/LFE Client for the Recurly Billing REST API*
 
 ## Table of Contents
 
@@ -92,7 +92,9 @@ in rcrly:
 
 ### Starting ``rcrly`` [&#x219F;](#table-of-contents)
 
-From the REPL, you'll need to execute the following before using:
+The ``make`` targets for both the LFE REPL and the Erlang shell start rcrly
+automatically. If you didn't use either of those, then you will need to
+execute the following before using rcrly:
 
 ```lisp
 > (rcrly:start)
@@ -101,7 +103,7 @@ From the REPL, you'll need to execute the following before using:
 At that point, you're ready to start making calls.
 
 If you're not in the REPL and you will be using this library programmatically,
-you will want to start ``rcrly`` when your application starts.
+you will want to make that call when your application starts.
 
 
 ### Authentication [&#x219F;](#table-of-contents)
@@ -110,7 +112,7 @@ In your OS shell, export your Recurly API key and your subdomain, e.g.:
 
 ```bash
 $ export RECURLY_API_KEY=GFEDCBA9876543210
-$ export RECURLY_HOST=yourco.recurly.com
+$ export RECURLY_HOST=yourname.recurly.com
 ```
 
 When you run the REPL or start the application from your shell, this will be
@@ -185,9 +187,21 @@ $ make shell-no-deps
 The rcrly client supports the following options which may be passed as
 an optional argument (as a property list) to ``get`` and ``post``
 functions:
-* ``batch-size`` - an integer between ``1`` and ``200`` representing the number of
-  results returned in the Recurly service responses
-* ``return-type`` - either the atom ``lfe`` or ``xml``; ``lfe`` is the default
+* ``batch-size`` - [NOT YET SUPPORTED] an integer between ``1`` and ``200``
+  representing the number of results returned in the Recurly service responses
+* ``return-type`` - either the atom ``data``, ``full``, or ``xml``. The default
+  is ``data`` and it returns the most limited set of data. ``full`` returns the
+  following data structure:
+  ```lisp
+  (#(response ...)
+   #(status #(...))
+   #(headers (...))
+   #(body (#(tag ...)
+           #(attr ...)
+           #(content (...)))))
+  ```
+  With ``return-type`` set to ``xml`` the raw binary XML result is returned;
+  this is the data in its completely unmodified form.
 
 General HTTP client options which may be passed in the same property list
 as the rcrly options. lhttpc will understand the following options:
@@ -204,11 +218,30 @@ as the rcrly options. lhttpc will understand the following options:
 
 ##### Accounts [&#x219F;](#table-of-contents)
 
+Recurly [Accounts documentation](https://docs.recurly.com/api/accounts)
+
 ###### ``get-accounts``
+
+```lisp
+> (set results (rcrly:get-accounts))
+(#(response ok)
+ #(status #(200 "OK"))
+ #(headers ...)
+ #(body
+   (#(tag "accounts")
+    #(attr (#(type "array")))
+    #(content
+     (#(account ...)
+      #(account ...)))
+     ...)))
+> 
+```
 
 ###### ``get-account``
 
 ##### Adjustments [&#x219F;](#table-of-contents)
+
+Recurly [Adjustments documentation](https://docs.recurly.com/api/adjustments)
 
 ###### ``get-adjustments``
 
@@ -216,15 +249,21 @@ as the rcrly options. lhttpc will understand the following options:
 
 ##### Billing Info [&#x219F;](#table-of-contents)
 
+Recurly [Billing Info documentation](https://docs.recurly.com/api/billing-info)
+
 ###### ``get-billing-info``
 
 ##### Invoices [&#x219F;](#table-of-contents)
+
+Recurly [Invoices documentation](https://docs.recurly.com/api/invoices)
 
 ###### ``get-all-invoices``
 
 ###### ``get-invoices``
 
 ##### Transactions [&#x219F;](#table-of-contents)
+
+Recurly [Transactions documentation](https://docs.recurly.com/api/transactions)
 
 ###### ``get-all-transactions``
 
