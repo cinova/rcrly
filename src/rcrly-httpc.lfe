@@ -47,22 +47,16 @@
 
 (defun response
   ((`#(ok #(,status ,headers ,body)))
-    `(#(status ,status)
-      #(headers ,headers)
-      #(body ,(body-error-check (parse-body-xml body) status))))
+   `(#(response ok)
+     #(status ,status)
+     #(headers ,headers)
+     #(body ,(body-error-check (rcrly-xml:parse-body body) status))))
   (((= `#(error ,_) error))
    ;; XXX let's find a good error and use that to refine this one
-   error))
-
-(defun parse-body-xml
-  ((`#(ok #(,tag ,attributes ,content) ,tail))
-   `(#(tag ,tag)
-     #(attr ,attributes)
-     #(content ,content)
-     #(tail ,tail)))
-  ((body)
-   (parse-body-xml
-     (erlsom:simple_form body))))
+   `(#(response error)
+     #(status 'undefined)
+     #(headers 'undefined)
+     #(body ,error))))
 
 (defun body-error-check
   ((`(#(tag "errors") ,_ ,content ,_) `#(,code ,msg))
