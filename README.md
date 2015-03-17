@@ -123,7 +123,11 @@ execute the following before using rcrly:
 
 ```lisp
 > (rcrly:start)
-(#(inets ok) #(ssl ok) #(lhttpc ok))
+(#(gproc ok)
+ #(econfig ok)
+ #(inets ok)
+ #(ssl ok)
+ #(lhttpc ok))
 ```
 At that point, you're ready to start making calls.
 
@@ -140,13 +144,20 @@ $ export RECURLY_API_KEY=GFEDCBA9876543210
 $ export RECURLY_HOST=yourname.recurly.com
 ```
 
-When you run the REPL or start the application from your shell, this will be
-used to create the authentiction header in every call.
+Or be sure to have these defined in your ``~/.rcrly/lfe.ini`` file:
+
+```ini
+[REST API]
+key = GFEDCBA9876543210
+host = yourname.recurly.com
+```
+
+When you run the REPL or start the application from your shell, these will be
+used to create the authentiction header in every call made to the REST API,
+per the specifications of the Recurly service.
 
 
 ### Making Calls [&#x219F;](#table-of-contents)
-
-[NOTE: This is a work in progress]
 
 This ``README`` won't document all the API calls availale with the service, as
 that is already done by Recurly [here](https://docs.recurly.com/api/).
@@ -240,6 +251,8 @@ as the rcrly options. lhttpc will understand the following options:
 
 
 #### The API [&#x219F;](#table-of-contents)
+
+[NOTE: This is a work in progress]
 
 ##### Accounts [&#x219F;](#table-of-contents)
 
