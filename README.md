@@ -61,6 +61,12 @@ Just add it to your ``rebar.config`` deps:
       ]}.
 ```
 
+Or, if you use ``lfe.config``:
+
+```lisp
+#(project (#(deps (#("cinova/rcrly" "master")))))
+```
+
 And then do the usual:
 
 ```bash
@@ -223,7 +229,27 @@ instead.
 
 #### ``get-in`` [&#x219F;](#table-of-contents)
 
-TBD
+The utillity function ``rcrly:get-in`` is inspired by the Clojure ``get-in``
+function, but in this case, tailored to work with the rcrly results which have
+been converted from XML to LFE/Erlang data structures. With a single call, you
+are able to retrieve data which is nested at any depth, providing just the keys
+needed to locate it.
+
+Here's an example:
+
+```lisp
+> (set results (rcrly:get-account 1))
+(#(response ok)
+ #(status #(200 "OK"))
+ #(headers ...)
+ #(body ...))
+> (rcrly:get-in '(address zip) results)
+("12345")
+```
+
+The ``zip`` field is nested in the ``address`` field. The ``address`` data
+is in the ``content`` of the ``body`` in ``results``.
+
 
 ### Handling Errors [&#x219F;](#table-of-contents)
 
