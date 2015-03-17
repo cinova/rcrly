@@ -5,9 +5,13 @@
 (include-lib "rcrly/include/options.lfe")
 
 (defun start ()
-  `(#(inets ,(inets:start))
-    #(ssl ,(ssl:start))
-    #(lhttpc ,(lhttpc:start))))
+  (prog1
+    `(#(gproc ,(application:start 'gproc))
+      #(econfig ,(application:start 'econfig))
+      #(inets ,(inets:start))
+      #(ssl ,(ssl:start))
+      #(lhttpc ,(lhttpc:start)))
+    (rcrly-cfg:open-cfg-file)))
 
 (defun new ()
   (new (get-default-options)))

@@ -72,8 +72,8 @@ Or, if you use ``lfe.config``:
 And then do the usual:
 
 ```bash
-    $ rebar get-deps
-    $ rebar compile
+    $ make get-deps
+    $ make compile
 ```
 
 
@@ -81,14 +81,39 @@ And then do the usual:
 
 ### Configuration [&#x219F;](#table-of-contents)
 
-The following environment variables may be set to override default configuration
-in rcrly:
+The LFE rcrly library supports two modes of configuration:
+* OS environment variables
+* the use of ``~/.rcrly/lfe.ini``
+
+OS environment variables take precedence over values in the configuration file.
+If you would like to use environment variables, the following may be set:
 
 * ``RECURLY_API_KEY``
 * ``RECURLY_HOST`` (e.g., ``yourname.recurly.com``)
 * ``RECURLY_DEFAULT_CURRENCY``
 * ``RECURLY_VERSION``
 * ``RECURLY_REQUEST_TIMEOUT``
+
+You have the option of using values stored in a configuration file, instead.
+This project comes with a sample configuration file you can copy and then edit:
+
+```bash
+cp sample-lfe.ini ~/.rcrly/lfe.ini
+```
+Or you can just use the following as a template:
+
+```ini
+[REST API]
+key = GFEDCBA9876543210
+host = yourname.recurly.com
+timeout = 10000
+version = v2
+```
+
+If neither of these methods is used to set a given variable, the default which
+is hard-coded in ``src/rcrly-cfg.lfe`` will be used -- and in the case of the
+API key or host this is almost certainly not what you want!
+
 
 ### Starting ``rcrly`` [&#x219F;](#table-of-contents)
 

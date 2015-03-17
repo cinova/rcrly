@@ -42,6 +42,7 @@ get-version:
 
 get-deps:
 	@echo "Getting dependencies ..."
+	@mkdir -p ~/.rcrly/
 	@PATH=$(SCRIPT_PATH) ERL_LIBS=$(ERL_LIBS) $(LFETOOL) download deps
 
 clean-ebin:

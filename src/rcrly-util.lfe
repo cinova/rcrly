@@ -21,3 +21,19 @@
   ((x) (when (is_integer x))
    (list_to_atom (integer_to_list x)))
   ((x) x))
+
+(defun get-defined
+  ;; undefined OS env values will match false
+  (((cons 'false rest))
+   (get-defined rest))
+  ;; undefined INI values will match undefined
+  (((cons 'undefined rest))
+   (get-defined rest))
+  (((cons match _))
+   match))
+
+(defun ->int
+  ((str) (when (is_list str))
+   (list_to_integer str))
+  ((x)
+   x))
