@@ -48,15 +48,27 @@
 
   To get attributes instead of content, get-in can be used to obtain the
   second-to-last nested value and then the attributes may be extracted from last
-  one."
+  one.
+
+  get-in supports a list of 3-tuples but also a list of 2-tuples which contain
+  3-tuples."
   (((= (cons first-key rest-keys) keys)
     (= (cons first-data rest-data) data))
-   (cond ((=:= (size first-data) 2)
+   (cond ((=:= (size first-data) 3)
+          (get-in-three-tuple keys data))
+         ((=:= (size first-data) 2)
           (get-in-three-tuple
             rest-keys
-            (lists:keyfind first-key 1 data)))
-         ((=:= (size first-data) 3)
-          (get-in-three-tuple keys data)))))
+            (element 2 (lists:keyfind first-key 1 data)))))))
+
+(defun one-or-all
+  "This is for use in filtering results that could either contain a single
+  element or a list of elements, returning just the element itself when
+  the passed list only has one element."
+  (((cons head '()))
+   head)
+  ((all)
+   all))
 
 (defun get-in-three-tuple (keys data)
   (lists:foldl #'find/2 data keys))
@@ -66,4 +78,5 @@
 
   This function assumes that the data desired is in the third (last) element
   of the three-tuple."
-  (element 3 (lists:keyfind key 1 data)))
+  (one-or-all
+    (element 3 (lists:keyfind key 1 data))))
