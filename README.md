@@ -20,18 +20,20 @@
     * [Options](#options-)
     * [The API](#the-api-)
       * [Accounts](#accounts-)
-      * Adjustments
-      * Billing Info
+      * [Adjustments](#adjustments-)
+      * [Billing Info](#billing-info-)
       * Coupons
       * Coupon Redemptions
-      * Invoices
+      * [Invoices](#invoices-)
       * Plans
       * Plan Add-ons
       * Subscriptions
-      * Transactions
+      * [Transactions](#transactions-)
   * [Working with Results](#working-with-results-)
     * [get-data](#get-data-)
     * [get-in](#get-in-)
+    * [Batched Results and Paging](#batched-results-and-paging-)
+    * [Relationships and Linked Data](#relationships-and-linked-data-)
   * [Handling Errors](#handling-errors-)
   * [Logging](#loggin-)
 
@@ -133,7 +135,8 @@ Calls from LFE are pretty standard:
 > (rcrly:start)
 (#(inets ok) #(ssl ok) #(lhttpc ok))
 > (rcrly:get-accounts)
-(#(status #(200 "OK"))
+(#(response ok)
+ #(status #(200 "OK"))
  #(headers ...)
  #(body ...))
 ```
@@ -201,7 +204,31 @@ as the rcrly options. lhttpc will understand the following options:
 
 ##### Accounts [&#x219F;](#table-of-contents)
 
-TBD
+###### ``get-accounts``
+
+###### ``get-account``
+
+##### Adjustments [&#x219F;](#table-of-contents)
+
+###### ``get-adjustments``
+
+###### ``get-adjustment``
+
+##### Billing Info [&#x219F;](#table-of-contents)
+
+###### ``get-billing-info``
+
+##### Invoices [&#x219F;](#table-of-contents)
+
+###### ``get-all-invoices``
+
+###### ``get-invoices``
+
+##### Transactions [&#x219F;](#table-of-contents)
+
+###### ``get-all-transactions``
+
+###### ``get-transactions``
 
 
 ### Working with Results [&#x219F;](#table-of-contents)
@@ -223,8 +250,9 @@ in most rcrly client results. For example:
  #("account" ...))
 ```
 
-Though this is useful, you may find that you use the ``rcrly:get-in`` more,
-instead.
+Though this is useful when dealing with response data, you may find that it is
+more beneficial to use the ``rcrly:get-in`` instead, as it allows you to extract
+just the data you need.
 
 
 #### ``get-in`` [&#x219F;](#table-of-contents)
@@ -250,6 +278,13 @@ Here's an example:
 The ``zip`` field is nested in the ``address`` field. The ``address`` data
 is in the ``content`` of the ``body`` in ``results``.
 
+#### Batched Results and Paging [&#x219F;](#table-of-contents)
+
+TBD
+
+#### Relationships and Linked Data [&#x219F;](#table-of-contents)
+
+TBD
 
 ### Handling Errors [&#x219F;](#table-of-contents)
 

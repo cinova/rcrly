@@ -40,14 +40,74 @@
 ;;; API functions
 
 (defun get-accounts ()
-  (get "/accounts"))
+  (get-accounts '()))
 
 (defun get-accounts (client-options)
   (get "/accounts" client-options))
 
 (defun get-account (id)
+  (get-account id '()))
+
+(defun get-account (id client-options)
   (get (++ "/accounts/"
-           (rcrly-util:arg->str id))))
+           (rcrly-util:arg->str id))
+       client-options))
+
+(defun get-adjustments (account-id)
+  (get-adjustments account-id '()))
+
+(defun get-adjustments (account-id client-options)
+  (get (++ "/accounts/"
+           (rcrly-util:arg->str account-id)
+           "/adjustments")
+       client-options))
+
+(defun get-adjustment (uuid)
+  (get-adjustment uuid '()))
+
+(defun get-adjustment (uuid client-options)
+  (get (++ "/adjustments/"
+           (rcrly-util:arg->str uuid))
+       client-options))
+
+(defun get-billing-info (account-id)
+  (get-billing-info account-id '()))
+
+(defun get-billing-info (account-id client-options)
+  (get (++ "/accounts/"
+           (rcrly-util:arg->str account-id)
+           "/billing_info")
+       client-options))
+
+(defun get-all-invoices ()
+  (get-all-invoices '()))
+
+(defun get-all-invoices (client-options)
+  (get "/invoices" client-options))
+
+(defun get-invoices (account-id)
+  (get-invoices account-id '()))
+
+(defun get-invoices (account-id client-options)
+  (get (++ "/accounts/"
+           (rcrly-util:arg->str account-id)
+           "/invoices")
+       client-options))
+
+(defun get-all-transactions ()
+  (get-all-transactions '()))
+
+(defun get-all-transactions (client-options)
+  (get "/transactions" client-options))
+
+(defun get-transactions (account-id)
+  (get-transactions account-id '()))
+
+(defun get-transactions (account-id client-options)
+  (get (++ "/accounts/"
+           (rcrly-util:arg->str account-id)
+           "/transactions")
+       client-options))
 
 ;;; Utility functions for this module
 
