@@ -14,3 +14,10 @@
   ((arg) (when (is_atom arg))
    (arg->str (atom_to_list arg)))
   ((arg) arg))
+
+(defun ->atom
+  ((x) (when (is_list x))
+   (list_to_atom x))
+  ((x) (when (is_integer x))
+   (list_to_atom (integer_to_list x)))
+  ((x) x))
