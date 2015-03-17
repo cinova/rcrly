@@ -127,4 +127,4 @@
     (proplists:get_value 'content)))
 
 (defun get-in (keys results)
-  (rcrly-xml:get-in keys (get-data results)))
+  (rcrly-xml:get-in keys results))
