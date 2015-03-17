@@ -170,29 +170,13 @@ quickly.
 Calls from LFE are pretty standard:
 
 ```lisp
-> (rcrly:start)
-(#(inets ok) #(ssl ok) #(lhttpc ok))
 > (rcrly:get-accounts)
-(#(response ok)
- #(status #(200 "OK"))
- #(headers ...)
- #(body ...))
+> (rcrly:get-accounts)
+#(ok
+  (#(account ...)
+   #(account ...)
+   ...))
 ```
-
-If you started the LFE REPL using the rcrly ``Makefile``, e.g.:
-
-```bash
-$ make repl-no-deps
-```
-
-then rcrly was started automatically, and you don't need to call ``(rcrly:start)``.
-
-
-``response``, ``status``, ``headers``, and ``body`` are returned in all calls,
-since these are often used to make subsequent calls to the Recurly services.
-``response`` is useful for pattern matching against ``ok`` or ``error`` results;
-``status`` is useful for matching against specific HTTP response codes.
-
 
 #### From Erlang [&#x219F;](#table-of-contents)
 
@@ -207,15 +191,10 @@ $ make shell-no-deps
 ```
 
 ```erlang
-1> rcrly:start().
-[{inets,{error,{already_started,inets}}},
- {ssl,{error,{already_started,ssl}}},
- {lhttpc,{error,{already_started,lhttpc}}}]
-2> rcrly:'get-accounts'().
-[{response,ok},
- {status,{200,"OK"}},
- {headers,[...]},
- {body,[{tag,"accounts"}, ...]}]
+1> rcrly:'get-accounts'().
+{ok,[{account, [...]},
+     {account, [...]},
+     ...]}
 ```
 
 #### Options [&#x219F;](#table-of-contents)
@@ -224,23 +203,90 @@ The rcrly client supports the following options which may be passed as
 an optional argument (as a property list) to ``get`` and ``post``
 functions:
 * ``batch-size`` - [NOT YET SUPPORTED] an integer between ``1`` and ``200``
-  representing the number of results returned in the Recurly service responses
-* ``return-type`` - either the atom ``data``, ``full``, or ``xml``. The default
-  is ``data`` and it returns the most limited set of data. ``full`` returns the
-  following data structure:
-  ```lisp
-  (#(response ...)
-   #(status #(...))
-   #(headers (...))
-   #(body (#(tag ...)
-           #(attr ...)
-           #(content (...)))))
-  ```
-  With ``return-type`` set to ``xml`` the raw binary XML result is returned;
-  this is the data in its completely unmodified form.
+  representing the number of results returned in the Recurly service responses;
+  defaults to ``20``.
+* ``follow-links`` - [NOT YET SUPPORTED] a boolean representing whether linked
+  data should be automatically quereied and added to the results; defaults to
+  ``false``.
+* ``return-type`` - what format the client calls shoudl take. Can be one of
+  ``data``, ``full``, or ``xml``; the default  is ``data``.
 
-General HTTP client options which may be passed in the same property list
-as the rcrly options. lhttpc will understand the following options:
+
+##### ``batch-size``
+
+TBD
+
+#### ``follow-links``
+
+TBD
+
+##### ``return-type``
+
+When the ``return-type`` is set to ``data`` (the default), the data from the
+response is what is returned:
+
+```lisp
+> (rcrly:get-account 1 `(#(return-type data)))
+#(ok
+  (#(adjustments ...)
+   #(invoices ...)
+   #(subscriptions ...)
+   #(transactions ...)
+   #(account_code () ("1"))
+   ...
+   #(address ...)
+   ...))
+```
+
+When the ``return-type`` is set to ``full``, the response is annotated and
+returned:
+
+```lisp
+> (rcrly:get-account 1 `(#(return-type full)))
+#(ok
+  (#(response ok)
+   #(status #(200 "OK"))
+   #(headers ...)
+   #(body
+     (#(tag "account")
+      #(attr (#(href "https://yourname.recurly.com/v2/accounts/1")))
+      #(content
+        (#(adjustments ...)
+         #(invoices ...)
+         #(subscriptions ...)
+         #(transactions ...)
+         ...
+         #(account_code () ("1"))
+         ...
+         #(address ...)
+         ...))
+      #(tail "\n")))))
+```
+
+When the ``return-type`` is set to ``xml``, the "raw" binary value is returned,
+as it is obtained from ``lhttpc``, without modification or any parsing:
+
+```lisp
+> (rcrly:get-account 1 `(#(return-type xml)))
+#(ok
+  #(#(200 "OK")
+    (#("strict-transport-security" "max-age=15768000; includeSubDomains")
+     #("x-request-id" "ac52s06cmfugp9oauclg")
+     #("cache-control" "max-age=0, private, must-revalidate")
+     ...)
+    #B(60 63 120 109 108 32 118 101 114 115 105 111 110  ...)))
+```
+
+If you wish to pass general HTTP client options to lhttpc, then you will need to use
+``rcrly-httpc:request/7``, which takes the following arguments:
+
+```
+endpoint method headers body timeout options lhttpc-options
+```
+
+where ``options`` are the rcrly options discussed above, and ``lhttpc-options``
+are the regular lhttpc options, the most significant of which are:
+
 * ``connect_options`` - a list of terms
 * ``send_retry`` - an integer
 * ``partial_upload`` - an integer (window size)
@@ -261,18 +307,12 @@ Recurly [Accounts documentation](https://docs.recurly.com/api/accounts)
 ###### ``get-accounts``
 
 ```lisp
-> (set results (rcrly:get-accounts))
-(#(response ok)
- #(status #(200 "OK"))
- #(headers ...)
- #(body
-   (#(tag "accounts")
-    #(attr (#(type "array")))
-    #(content
-     (#(account ...)
-      #(account ...)))
-     ...)))
-> 
+> (set `#(ok ,accounts) (rcrly:get-accounts))
+#(ok
+  (#(account ...)
+   #(account ...)))
+> (length accounts)
+2
 ```
 
 ###### ``get-account``
@@ -310,21 +350,34 @@ Recurly [Transactions documentation](https://docs.recurly.com/api/transactions)
 
 ### Working with Results [&#x219F;](#table-of-contents)
 
+All results in rcrly are of the form ``#(ok ...)`` or ``#(error ...)``, with the
+elided contents of those tuples changing depending upon context. This is the
+standard approach for Erlang libraries, so should be quite familiar to users.
+
+
 #### ``get-data`` [&#x219F;](#table-of-contents)
 
 The ``get-data`` utility function is provided in the ``rcrly`` module and is
-useful for extracing response data from the data structure that is returned
-in most rcrly client results. For example:
+useful for extracing response data returned from client requests made with
+the ``full`` option. It assumes a nested property list structure with the
+``content`` key in the ``body``'s property list.
+
+Example usage:
 
 ```lisp
-> (set results (rcrly:get-accounts))
-(#(response ok)
- #(status #(200 "OK"))
- #(headers ...)
- #(body ...))
+> (set `#(ok ,results) (rcrly:get-accounts `(#(return-type full))))
+#(ok
+  (#(response ok)
+   #(status #(200 "OK"))
+   #(headers ...)
+   ...))
 > (set data (rcrly:get-data results))
 (#("account" ...)
  #("account" ...))
+> (rcrly:get-data results)
+(#(account ...)
+ #(account ...)
+ ...)
 ```
 
 Though this is useful when dealing with response data, you may find that it is
@@ -333,6 +386,8 @@ just the data you need.
 
 
 #### ``get-in`` [&#x219F;](#table-of-contents)
+
+[NOTE: this function is currrently getting updated to use the new output format]
 
 The utillity function ``rcrly:get-in`` is inspired by the Clojure ``get-in``
 function, but in this case, tailored to work with the rcrly results which have
@@ -355,17 +410,22 @@ Here's an example:
 The ``zip`` field is nested in the ``address`` field. The ``address`` data
 is in the ``content`` of the ``body`` in ``results``.
 
+
 #### Batched Results and Paging [&#x219F;](#table-of-contents)
 
 TBD
+
 
 #### Relationships and Linked Data [&#x219F;](#table-of-contents)
 
 TBD
 
+
 ### Handling Errors [&#x219F;](#table-of-contents)
 
-TBD
+As mentioned in the "Working with Results" section, 
+
+[more to come, examples, etc.]
 
 
 ### Logging [&#x219F;](#table-of-contents)
