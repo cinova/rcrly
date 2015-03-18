@@ -24,7 +24,7 @@
     * [Batched Results and Paging](#batched-results-and-paging-)
     * [Relationships and Linked Data](#relationships-and-linked-data-)
   * [Handling Errors](#handling-errors-)
-  * [Logging](#loggin-)
+  * [Logging](#logging-)
   * [The API](#the-api-)
     * [Accounts](#accounts-)
     * [Adjustments](#adjustments-)
@@ -211,15 +211,15 @@ functions:
   ``data``, ``full``, or ``xml``; the default  is ``data``.
 
 
-##### ``batch-size``
+##### ``batch-size`` [&#x219F;](#table-of-contents)
 
 TBD
 
-##### ``follow-links``
+##### ``follow-links`` [&#x219F;](#table-of-contents)
 
 TBD
 
-##### ``return-type``
+##### ``return-type`` [&#x219F;](#table-of-contents)
 
 When the ``return-type`` is set to ``data`` (the default), the data from the
 response is what is returned:
