@@ -498,7 +498,8 @@ TBD
 
 ### The API [&#x219F;](#table-of-contents)
 
-[NOTE: This is a work in progress]
+Each API call has a default arity and then an arity+1 where the "+1" is an
+argument for rcrly client options (see the "Options" section above).
 
 For each of the API functions listed below, be sure to examine the linked
 Recurly documentation for information about payloads.
@@ -508,6 +509,8 @@ Recurly documentation for information about payloads.
 Recurly [Accounts documentation](https://docs.recurly.com/api/accounts)
 
 ##### ``get-accounts``
+
+Get all accounts.
 
 ```lisp
 > (set `#(ok ,accounts) (rcrly:get-accounts))
@@ -520,7 +523,9 @@ Recurly [Accounts documentation](https://docs.recurly.com/api/accounts)
 
 ##### ``get-account``
 
-Takes a single arguement and returns
+Takes a single arguement and returns data for the account associated with
+the provided id.
+
 ```lisp
 > (set `#(ok ,account) (rcrly:get-account 1))
 #(ok
@@ -539,7 +544,55 @@ Recurly [Adjustments documentation](https://docs.recurly.com/api/adjustments)
 
 ##### ``get-adjustments``
 
+Takes an account id.
+
+```lisp
+> (set `#(ok ,adjustments) (rcrly:get-adjustments 1))
+#(ok
+  #(adjustments
+    (#(type "array"))
+    (#(adjustment ...)
+     #(adjustment ...)
+     ...)))
+```
+
 ##### ``get-adjustment``
+
+Takes a UUID.
+
+```lisp
+> (set `#(ok ,adjustment) (rcrly:get-adjustment "2d97cfa52e80a675a532ba4e8ea25401"))
+#(ok
+  #(adjustment
+    (#(type "credit")
+     #(href
+       "https://cinovadev.recurly.com/v2/adjustments/2d97cfa52e80a675a532ba4e8ea25401"))
+    (#(account (#(href "https://cinovadev.recurly.com/v2/accounts/1")) ())
+     #(uuid () ("2d97cfa52e80a675a532ba4e8ea25401"))
+     #(state () ("pending"))
+     #(description () ())
+     #(accounting_code () ())
+     #(product_code (#(nil "nil")) ())
+     #(origin () ("credit"))
+     #(unit_amount_in_cents (#(type "integer")) ("-100"))
+     #(quantity (#(type "integer")) ("1"))
+     #(discount_in_cents (#(type "integer")) ("0"))
+     #(tax_in_cents (#(type "integer")) ("0"))
+     #(total_in_cents (#(type "integer")) ("-100"))
+     #(currency () ("USD"))
+     #(taxable (#(type "boolean")) ("false"))
+     #(start_date (#(type "datetime")) ("2015-03-17T18:34:56Z"))
+     #(end_date (#(nil "nil")) ())
+     #(created_at (#(type "datetime")) ("2015-03-17T18:34:56Z")))))
+```
+```lisp
+> (rcrly:get-in '(adjustment total_in_cents) adjustment)
+"-100"
+> (rcrly:get-in '(adjustment state) adjustment)
+"pending"
+> (rcrly:get-in '(adjustment origin) adjustment)
+"credit"
+```
 
 #### Billing Info [&#x219F;](#table-of-contents)
 
