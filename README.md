@@ -639,7 +639,28 @@ Recurly [Billing Info documentation](https://docs.recurly.com/api/billing-info)
 Takes an account id.
 
 ```lisp
-
+> (set `#(ok ,info) (rcrly:get-billing-info 1))
+#(ok
+  #(billing_info
+    (#(type "credit_card")
+     #(href "https://yourname.recurly.com/v2/accounts/1/billing_info"))
+    (#(account (#(href "https://yourname.recurly.com/v2/accounts/1")) ())
+     ...
+     #(company (#(nil "nil")) ())
+     #(address1 () ("108 Main St"))
+     ...
+     #(city () ("Fairville"))
+     #(state () ("WI"))
+     #(zip () ("12345"))
+     ...
+     #(card_type () ("Visa"))
+     #(year (#(type "integer")) ("2016"))
+     #(month (#(type "integer")) ("3"))
+     ...)))
+```
+```lisp
+> (rcrly:get-in '(billing_info card_type) info)
+"Visa"
 ```
 
 #### Invoices [&#x219F;](#table-of-contents)
