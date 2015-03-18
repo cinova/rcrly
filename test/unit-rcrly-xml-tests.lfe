@@ -46,17 +46,17 @@
   (is-equal '("108 Main"
               "Apt #3") (rcrly-xml:find 'address (test-data-1))))
 
-(deftest get-in-three-tuple
+(deftest get-in-3tuple
   (is-equal "thing"
-            (rcrly-xml:get-in-three-tuple '(level1-1) (test-data-2)))
+            (rcrly-xml:get-in-3tuple '(level1-1) (test-data-2)))
   (is-equal "brother"
-            (rcrly-xml:get-in-three-tuple '(level1-3 level2-3)
+            (rcrly-xml:get-in-3tuple '(level1-3 level2-3)
                                           (test-data-2)))
   (is-equal "bit"
-            (rcrly-xml:get-in-three-tuple '(level1-3 level2-2 level3-2)
+            (rcrly-xml:get-in-3tuple '(level1-3 level2-2 level3-2)
                                           (test-data-2)))
   (is-equal "hat"
-            (rcrly-xml:get-in-three-tuple '(level1-3 level2-2 level3-1 level4-3)
+            (rcrly-xml:get-in-3tuple '(level1-3 level2-2 level3-1 level4-3)
                                           (test-data-2))))
 
 (deftest get-in
