@@ -476,9 +476,49 @@ Recurly are a tuple of either ``#(ok ...)`` or ``#(error ...)``. All processing
 of rcrly results should pattern match against these typles, handling the error
 cases as appropriate for the application using the rcrly library.
 
+#### Recurly Errors
+
+The Recurly API will return errors under various circumstances. For instance,
+an error is returned when attempting to look up billing information with a
+non-existent account:
+
+```lisp
+> (set `#(error ,error) (rcrly:get-billing-info 'noaccountid))
+#(error
+  #(error ()
+    (#(symbol () ("not_found"))
+     #(description
+       (#(lang "en-US"))
+       ("Couldn't find Account with account_code = noaccountid")))))
+```
+
+You may use the ``get-in`` function to extract error information:
+
+```lisp
+> (rcrly:get-in '(error description) error)
+"Couldn't find Account with account_code = noaccountid"
+```
+
 #### HTTP Errors [&#x219F;](#table-of-contents)
 
-[more to come, examples, etc.]
+Any HTTP request that generates an HTTP status code equal to or greater than
+400 will be converted to an error. For example, requesting account information
+with an id that no account has will generate a ``404 - Not Found`` which will
+be converted by rcrly to an application error:
+
+```lisp
+> (set `#(error ,error) (rcrly:get-account 'noaccountid))
+#(error
+  #(error ()
+    (#(symbol () ("not_found"))
+     #(description
+       (#(lang "en-US"))
+       ("Couldn't find Account with account_code = noaccountid")))))
+```
+```lisp
+> (rcrly:get-in '(error description) error)
+"Couldn't find Account with account_code = noaccountid"
+```
 
 
 #### rcrly Errors [&#x219F;](#table-of-contents)
@@ -566,18 +606,13 @@ Takes a UUID.
   #(adjustment
     (#(type "credit")
      #(href
-       "https://cinovadev.recurly.com/v2/adjustments/2d97cfa52e80a675a532ba4e8ea25401"))
-    (#(account (#(href "https://cinovadev.recurly.com/v2/accounts/1")) ())
+       "https://yourname.recurly.com/v2/adjustments/2d97cf12a5...."))
+    (#(account (#(href "https://yourname.recurly.com/v2/accounts/1")) ())
      #(uuid () ("2d97cfa52e80a675a532ba4e8ea25401"))
      #(state () ("pending"))
-     #(description () ())
-     #(accounting_code () ())
-     #(product_code (#(nil "nil")) ())
+     ...
      #(origin () ("credit"))
-     #(unit_amount_in_cents (#(type "integer")) ("-100"))
-     #(quantity (#(type "integer")) ("1"))
-     #(discount_in_cents (#(type "integer")) ("0"))
-     #(tax_in_cents (#(type "integer")) ("0"))
+     ...
      #(total_in_cents (#(type "integer")) ("-100"))
      #(currency () ("USD"))
      #(taxable (#(type "boolean")) ("false"))
@@ -599,6 +634,12 @@ Takes a UUID.
 Recurly [Billing Info documentation](https://docs.recurly.com/api/billing-info)
 
 ##### ``get-billing-info``
+
+Takes an account id.
+
+```lisp
+
+```
 
 #### Invoices [&#x219F;](#table-of-contents)
 
