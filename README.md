@@ -19,11 +19,15 @@
     * [From Erlang](#from-erlang-)
     * [Options](#options-)
   * [Working with Results](#working-with-results-)
+    * [Format](#format-)
     * [get-data](#get-data-)
     * [get-in](#get-in-)
     * [Batched Results and Paging](#batched-results-and-paging-)
     * [Relationships and Linked Data](#relationships-and-linked-data-)
   * [Handling Errors](#handling-errors-)
+    * [HTTP Errors](#http-errors-)
+    * [rcrly Errors](#rcrly-errors-)
+    * [lhttpc Errors](#lhttpc-errors-)
   * [Logging](#logging-)
   * [The API](#the-api-)
     * [Accounts](#accounts-)
@@ -303,6 +307,94 @@ elided contents of those tuples changing depending upon context. This is the
 standard approach for Erlang libraries, so should be quite familiar to users.
 
 
+#### Format [&#x219F;](#table-of-contents)
+
+As noted above, the format of the results depend upon what value you have passed
+as the ``return-type``; by default, the ``data`` type is passed and this simply
+returns the data requested by the particular API call (not the headers, HTTP
+status, body, XML conversion info, etc. -- if you want that, you'll need to pass
+the ``full`` value associated with the ``return-type``).
+
+The API calls return XML that has been parsed and converted to LFE data
+structures by the [erlsom](https://github.com/willemdj/erlsom) library.
+
+For instance, here's what a standard Recurly XML result looks like:
+
+```xml
+<account href="https://yourname.recurly.com/v2/accounts/1">
+  <adjustments href="https://yourname.recurly.com/v2/accounts/1/adjustments"/>
+  <billing_info href="https://yourname.recurly.com/v2/accounts/1/billing_info"/>
+  <invoices href="https://yourname.recurly.com/v2/accounts/1/invoices"/>
+  <redemption href="https://yourname.recurly.com/v2/accounts/1/redemption"/>
+  <subscriptions href="https://yourname.recurly.com/v2/accounts/1/subscriptions"/>
+  <transactions href="https://yourname.recurly.com/v2/accounts/1/transactions"/>
+  <account_code>1</account_code>
+  <state>active</state>
+  <username nil="nil"></username>
+  <email>verena@example.com</email>
+  <first_name>Verena</first_name>
+  <last_name>Example</last_name>
+  <company_name></company_name>
+  <vat_number nil="nil"></vat_number>
+  <tax_exempt type="boolean">false</tax_exempt>
+  <address>
+    <address1>108 Main St.</address1>
+    <address2>Apt #3</address2>
+    <city>Fairville</city>
+    <state>WI</state>
+    <zip>12345</zip>
+    <country>US</country>
+    <phone nil="nil"></phone>
+  </address>
+  <accept_language nil="nil"></accept_language>
+  <hosted_login_token>a92468579e9c4231a6c0031c4716c01d</hosted_login_token>
+  <created_at type="datetime">2011-10-25T12:00:00</created_at>
+</account>
+```
+
+And here is that same result from the LFE rcrly library:
+
+```lisp
+#(account
+  (#(href "https://yourname.recurly.com/v2/accounts/1"))
+  (#(adjustments
+     (#(href "https://yourname.recurly.com/v2/accounts/1/adjustments"))
+     ())
+   #(invoices
+     (#(href "https://yourname.recurly.com/v2/accounts/1/invoices"))
+     ())
+   #(subscriptions
+     (#(href "https://yourname.recurly.com/v2/accounts/1/subscriptions"))
+     ())
+   #(transactions
+     (#(href "https://yourname.recurly.com/v2/accounts/1/transactions"))
+     ())
+   #(account_code () ("1"))
+   #(state () ("active"))
+   #(username () ())
+   #(email () ("verena@example.com"))
+   #(first_name () ("Verena"))
+   #(last_name () ("Example"))
+   #(company_name () ())
+   #(vat_number (#(nil "nil")) ())
+   #(tax_exempt (#(type "boolean")) ("false"))
+   #(address ()
+     (#(address1 () ("108 Main St."))
+      #(address2 () ("Apt #3"))
+      #(city () ("Fairville"))
+      #(state () ("WI"))
+      #(zip () ("12345"))
+      #(country () ("US"))
+      #(phone (#(nil "nil")) ())))
+   #(accept_language (#(nil "nil")) ())
+   #(hosted_login_token () ("a92468579e9c4231a6c0031c4716c01d"))
+   #(created_at (#(type "datetime")) ("2011-10-25T12:00:00"))))
+```
+
+The rcrly library offers a couple of convenience functions for extracting data
+from this sort of structure -- see the next two sections for more information
+about data extraction.
+
 #### ``get-data`` [&#x219F;](#table-of-contents)
 
 The ``get-data`` utility function is provided in the ``rcrly`` module and is
@@ -326,6 +418,7 @@ Example usage:
 
 > (rcrly:get-data results)
 #(accounts
+  (#(type "array"))
   (#(account ...)
    #(account ...)))
 ```
@@ -352,14 +445,15 @@ Here's an example:
 > (set `#(ok ,account) (rcrly:get-account 1))
 #(ok
   #(account
+    (#(href ...))
     (#(adjustments ...)
      ...)))
 > (rcrly:get-in '(account address city) account)
 "Fairville"
 ```
 
-The ``zip`` field is nested in the ``address`` field. The ``address`` data
-is in the ``content`` of the ``body`` in ``results``.
+The ``city`` field is nested in the ``address`` field. The ``address`` data
+is nested in the ``account``.
 
 
 #### Batched Results and Paging [&#x219F;](#table-of-contents)
@@ -374,7 +468,22 @@ TBD
 
 ### Handling Errors [&#x219F;](#table-of-contents)
 
-As mentioned in the "Working with Results" section, 
+As mentioned in the "Working with Results" section, all parsed responses from
+Recurly are a tuple of either ``#(ok ...)`` or ``#(error ...)``. All processing
+of rcrly results should pattern match against these typles, handling the error
+cases as appropriate for the application using the rcrly library.
+
+#### HTTP Errors [&#x219F;](#table-of-contents)
+
+[more to come, examples, etc.]
+
+
+#### rcrly Errors [&#x219F;](#table-of-contents)
+
+[more to come, examples, etc.]
+
+
+#### lhttpc Errors [&#x219F;](#table-of-contents)
 
 [more to come, examples, etc.]
 
@@ -387,6 +496,9 @@ TBD
 ### The API [&#x219F;](#table-of-contents)
 
 [NOTE: This is a work in progress]
+
+For each of the API functions listed below, be sure to examine the linked
+Recurly documentation for information about payloads.
 
 #### Accounts [&#x219F;](#table-of-contents)
 
@@ -404,6 +516,19 @@ Recurly [Accounts documentation](https://docs.recurly.com/api/accounts)
 ```
 
 ##### ``get-account``
+
+Takes a single arguement and returns
+```lisp
+> (set `#(ok ,account) (rcrly:get-account 1))
+#(ok
+  #(account
+    (#(adjustments ...)
+     ...)))
+> (rcrly:get-in '(account state) account)
+"active"
+> (rcrly:get-in '(account address city) account)
+"Fairville"
+```
 
 #### Adjustments [&#x219F;](#table-of-contents)
 
