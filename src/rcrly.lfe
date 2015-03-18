@@ -1,7 +1,6 @@
 (defmodule rcrly
   (export all))
 
-(include-lib "lutil/include/compose.lfe")
 (include-lib "rcrly/include/options.lfe")
 
 (defun start ()
@@ -121,10 +120,10 @@
              default-currency (rcrly-cfg:get-default-currency)))
 
 (defun get-data (results)
-  (->>
-    results
-    (proplists:get_value 'body)
-    (proplists:get_value 'content)))
+  (rcrly-xml:get-data results))
 
 (defun get-in (keys results)
   (rcrly-xml:get-in keys results))
+
+(defun get-linked (keys results)
+  (rcrly-xml:get-linked keys results))

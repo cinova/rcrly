@@ -41,6 +41,11 @@
           (convert-keys tail)))
   ((x) x))
 
+(defun get-data (results)
+  (->> results
+       (proplists:get_value 'body)
+       (proplists:get_value 'content)))
+
 (defun get-in
   "get-in assumes that the last element of the three-tuple is the one that holds
   the desired data. As this is the 'content' element of the tuple as parsed by
@@ -57,9 +62,9 @@
   (((= (cons first-key rest-keys) keys)
     (= (cons first-data rest-data) data))
    (cond ((=:= (size first-data) 3)
-          (get-in-3tuple keys data))
+          (get-content-in-3tuple keys data))
          ((=:= (size first-data) 2)
-          (get-in-3tuple
+          (get-content-in-3tuple
             rest-keys
             (element 2 (lists:keyfind first-key 1 data)))))))
 
@@ -72,10 +77,10 @@
   ((all)
    all))
 
-(defun get-in-3tuple (keys data)
-  (lists:foldl #'find/2 data keys))
+(defun get-content-in-3tuple (keys data)
+  (lists:foldl #'find-content/2 data keys))
 
-(defun find (key data)
+(defun find-content (key data)
   "This is necesary since the proplists module requires 2-tuples only.
 
   This function assumes that the data desired is in the third (last) element

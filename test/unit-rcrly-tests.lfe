@@ -8,20 +8,11 @@
 
 (include-lib "ltest/include/ltest-macros.lfe")
 
-;;; data for tests
-
-(defun test-data-1 ()
-  `(#(key1 val1)
-    #(key2 val2)
-    #(body (#(key3 val3)
-            #(key4 val4)
-            #(content "some content")))
-    #(key5 val5)))
-
 ;;; actual tests
 
 (deftest get-data
-  (is-equal "some content" (rcrly:get-data (test-data-1))))
+  (is-equal "some content"
+            (rcrly:get-data (unit-rcrly-xml-tests:test-data-0))))
 
 (deftest get-in
   ;; test just the standard 3-tuple data structure
