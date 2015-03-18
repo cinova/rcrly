@@ -15,7 +15,7 @@
   ((`#(ok #(,tag ,attributes ,content) ,tail))
    `(#(tag ,tag)
      #(attr ,attributes)
-     #(content #(,tag ,content))
+     #(content #(,tag ,attributes ,content))
      #(tail ,tail)))
   ((body)
    (parse-body-raw
