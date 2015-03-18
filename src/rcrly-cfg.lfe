@@ -9,6 +9,8 @@
 (defmodule rcrly-cfg
   (export all))
 
+(include-lib "lutil/include/compose.lfe")
+
 ;;; Default configuration values, used as a last resort
 
 (defun host () "yourname.recurly.com")
@@ -19,6 +21,10 @@
 (defun config-file () "~/.rcrly/lfe.ini")
 (defun config-id () 'rcrly-ini)
 (defun config-section () "REST API")
+(defun get-log-level ()
+  (->> (lcfg-log:get-local-logging)
+       (proplists:get_value 'options)
+       (proplists:get_value 'lager_console_backend)))
 
 ;;; General config functions
 
