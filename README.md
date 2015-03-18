@@ -18,17 +18,6 @@
     * [From LFE](#from-lfe-)
     * [From Erlang](#from-erlang-)
     * [Options](#options-)
-    * [The API](#the-api-)
-      * [Accounts](#accounts-)
-      * [Adjustments](#adjustments-)
-      * [Billing Info](#billing-info-)
-      * Coupons
-      * Coupon Redemptions
-      * [Invoices](#invoices-)
-      * Plans
-      * Plan Add-ons
-      * Subscriptions
-      * [Transactions](#transactions-)
   * [Working with Results](#working-with-results-)
     * [get-data](#get-data-)
     * [get-in](#get-in-)
@@ -36,6 +25,17 @@
     * [Relationships and Linked Data](#relationships-and-linked-data-)
   * [Handling Errors](#handling-errors-)
   * [Logging](#loggin-)
+  * [The API](#the-api-)
+    * [Accounts](#accounts-)
+    * [Adjustments](#adjustments-)
+    * [Billing Info](#billing-info-)
+    * Coupons
+    * Coupon Redemptions
+    * [Invoices](#invoices-)
+    * Plans
+    * Plan Add-ons
+    * Subscriptions
+    * [Transactions](#transactions-)
 
 
 ## Introduction [&#x219F;](#table-of-contents)
@@ -215,7 +215,7 @@ functions:
 
 TBD
 
-#### ``follow-links``
+##### ``follow-links``
 
 TBD
 
@@ -294,58 +294,6 @@ are the regular lhttpc options, the most significant of which are:
 * ``proxy`` - a URL string
 * ``proxy_ssl_options`` - a list of terms
 * ``pool`` - pid or atom
-
-
-#### The API [&#x219F;](#table-of-contents)
-
-[NOTE: This is a work in progress]
-
-##### Accounts [&#x219F;](#table-of-contents)
-
-Recurly [Accounts documentation](https://docs.recurly.com/api/accounts)
-
-###### ``get-accounts``
-
-```lisp
-> (set `#(ok ,accounts) (rcrly:get-accounts))
-#(ok
-  (#(account ...)
-   #(account ...)))
-> (length accounts)
-2
-```
-
-###### ``get-account``
-
-##### Adjustments [&#x219F;](#table-of-contents)
-
-Recurly [Adjustments documentation](https://docs.recurly.com/api/adjustments)
-
-###### ``get-adjustments``
-
-###### ``get-adjustment``
-
-##### Billing Info [&#x219F;](#table-of-contents)
-
-Recurly [Billing Info documentation](https://docs.recurly.com/api/billing-info)
-
-###### ``get-billing-info``
-
-##### Invoices [&#x219F;](#table-of-contents)
-
-Recurly [Invoices documentation](https://docs.recurly.com/api/invoices)
-
-###### ``get-all-invoices``
-
-###### ``get-invoices``
-
-##### Transactions [&#x219F;](#table-of-contents)
-
-Recurly [Transactions documentation](https://docs.recurly.com/api/transactions)
-
-###### ``get-all-transactions``
-
-###### ``get-transactions``
 
 
 ### Working with Results [&#x219F;](#table-of-contents)
@@ -434,3 +382,55 @@ As mentioned in the "Working with Results" section,
 ### Logging [&#x219F;](#table-of-contents)
 
 TBD
+
+
+### The API [&#x219F;](#table-of-contents)
+
+[NOTE: This is a work in progress]
+
+#### Accounts [&#x219F;](#table-of-contents)
+
+Recurly [Accounts documentation](https://docs.recurly.com/api/accounts)
+
+##### ``get-accounts``
+
+```lisp
+> (set `#(ok ,accounts) (rcrly:get-accounts))
+#(ok
+  (#(account ...)
+   #(account ...)))
+> (length accounts)
+2
+```
+
+##### ``get-account``
+
+#### Adjustments [&#x219F;](#table-of-contents)
+
+Recurly [Adjustments documentation](https://docs.recurly.com/api/adjustments)
+
+##### ``get-adjustments``
+
+##### ``get-adjustment``
+
+#### Billing Info [&#x219F;](#table-of-contents)
+
+Recurly [Billing Info documentation](https://docs.recurly.com/api/billing-info)
+
+##### ``get-billing-info``
+
+#### Invoices [&#x219F;](#table-of-contents)
+
+Recurly [Invoices documentation](https://docs.recurly.com/api/invoices)
+
+##### ``get-all-invoices``
+
+##### ``get-invoices``
+
+#### Transactions [&#x219F;](#table-of-contents)
+
+Recurly [Transactions documentation](https://docs.recurly.com/api/transactions)
+
+##### ``get-all-transactions``
+
+##### ``get-transactions``
