@@ -445,7 +445,12 @@ Here's an example:
   #(account
     (#(href ...))
     (#(adjustments ...)
-     ...)))
+    ...
+    #(address ()
+     (...
+      #(city () ("Fairville"))
+      ...))
+    ...)))
 > (rcrly:get-in '(account address city) account)
 "Fairville"
 ```
