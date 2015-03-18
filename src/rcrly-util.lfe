@@ -37,3 +37,19 @@
    (list_to_integer str))
   ((x)
    x))
+
+(defun rdecons (list)
+  "Reverse de-cons function: instead of head/tail, it returns
+  all-but-last/last."
+  (let ((`#(,all-but-last ,last) (lists:split (- (length list) 1) list)))
+    (list all-but-last (car last))))
+
+(defun rcar (list)
+  "Returns the last element."
+  (let ((`(,_ ,last) (rdecons list)))
+    last))
+
+(defun rcdr (list)
+  "Returns all but the last element."
+  (let ((`(,all-but-last ,_) (rdecons list)))
+    all-but-last))
