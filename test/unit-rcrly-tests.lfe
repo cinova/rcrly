@@ -8,8 +8,6 @@
 
 (include-lib "ltest/include/ltest-macros.lfe")
 
-;;; actual tests
-
 (deftest get-data
   (is-equal "some content"
             (rcrly:get-data (unit-rcrly-xml-tests:test-data-0))))
