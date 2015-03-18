@@ -39,6 +39,9 @@
     #(key2 val2)
     #(key3 ,(test-data-2))))
 
+(defun test-data-4 ()
+  `#(key1 ,(test-data-2)))
+
 ;;; actual tests
 
 (deftest find
@@ -83,4 +86,16 @@
                               (test-data-3)))
   (is-equal "hat"
             (rcrly-xml:get-in '(key3 level1-3 level2-2 level3-1 level4-3)
-                              (test-data-3))))
+                              (test-data-3)))
+  ;; test a list of 3-tuples in a tuple (common in parsed results)
+  (is-equal "thing"
+            (rcrly-xml:get-in '(key1 level1-1) (test-data-4)))
+  (is-equal "brother"
+            (rcrly-xml:get-in '(key1 level1-3 level2-3)
+                              (test-data-4)))
+  (is-equal "bit"
+            (rcrly-xml:get-in '(key1 level1-3 level2-2 level3-2)
+                              (test-data-4)))
+  (is-equal "hat"
+            (rcrly-xml:get-in '(key1 level1-3 level2-2 level3-1 level4-3)
+                              (test-data-4))))
