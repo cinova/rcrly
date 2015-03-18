@@ -369,20 +369,23 @@ Example usage:
 #(ok
   (#(response ok)
    #(status #(200 "OK"))
-   #(headers ...)
-   ...))
-> (set data (rcrly:get-data results))
-(#("account" ...)
- #("account" ...))
+   #(headers (...))
+   #(body
+     (#(tag "accounts")
+      #(attr (#(type "array")))
+      #(content
+        #(accounts ...))))))
+
 > (rcrly:get-data results)
-(#(account ...)
- #(account ...)
- ...)
+#(accounts
+  (#(account ...)
+   #(account ...)))
 ```
 
-Though this is useful when dealing with response data, you may find that it is
-more beneficial to use the ``rcrly:get-in`` instead, as it allows you to extract
-just the data you need.
+Though this is useful when dealing with response data from ``full`` the return
+type, you may find that it is more convenient to use the default ``data`` return
+type with the ``rcrly:get-in`` function instead, as it allows you to extract
+just the data you need. See below for an example.
 
 
 #### ``get-in`` [&#x219F;](#table-of-contents)
@@ -398,13 +401,13 @@ needed to locate it.
 Here's an example:
 
 ```lisp
-> (set results (rcrly:get-account 1))
-(#(response ok)
- #(status #(200 "OK"))
- #(headers ...)
- #(body ...))
-> (rcrly:get-in '(address zip) results)
-("12345")
+> (set `#(ok ,account) (rcrly:get-account 1))
+#(ok
+  #(account
+    (#(adjustments ...)
+     ...)))
+> (rcrly:get-in '(account address city) account)
+"Fairville"
 ```
 
 The ``zip`` field is nested in the ``address`` field. The ``address`` data
