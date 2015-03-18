@@ -250,15 +250,16 @@ returned:
      (#(tag "account")
       #(attr (#(href "https://yourname.recurly.com/v2/accounts/1")))
       #(content
-        (#(adjustments ...)
-         #(invoices ...)
-         #(subscriptions ...)
-         #(transactions ...)
-         ...
-         #(account_code () ("1"))
-         ...
-         #(address ...)
-         ...))
+        #(account
+          (#(adjustments ...)
+           #(invoices ...)
+           #(subscriptions ...)
+           #(transactions ...)
+           ...
+           #(account_code () ("1"))
+           ...
+           #(address ...)
+           ...)))
       #(tail "\n")))))
 ```
 
