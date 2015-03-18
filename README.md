@@ -25,6 +25,7 @@
     * [Batched Results and Paging](#batched-results-and-paging-)
     * [Relationships and Linked Data](#relationships-and-linked-data-)
   * [Handling Errors](#handling-errors-)
+    * [Recurly Errors](#recurly-errors-)
     * [HTTP Errors](#http-errors-)
     * [rcrly Errors](#rcrly-errors-)
     * [lhttpc Errors](#lhttpc-errors-)
