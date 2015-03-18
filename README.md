@@ -171,7 +171,6 @@ Calls from LFE are pretty standard:
 
 ```lisp
 > (rcrly:get-accounts)
-> (rcrly:get-accounts)
 #(ok
   (#(account ...)
    #(account ...)
