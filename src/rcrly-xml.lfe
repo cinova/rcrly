@@ -15,7 +15,7 @@
   ((`#(ok #(,tag ,attributes ,content) ,tail))
    `(#(tag ,tag)
      #(attr ,attributes)
-     #(content ,content)
+     #(content #(,tag ,content))
      #(tail ,tail)))
   ((body)
    (parse-body-raw
@@ -52,6 +52,8 @@
 
   get-in supports a list of 3-tuples but also a list of 2-tuples which contain
   3-tuples."
+  ((keys data) (when (is_tuple data))
+   (get-in keys (list data)))
   (((= (cons first-key rest-keys) keys)
     (= (cons first-data rest-data) data))
    (cond ((=:= (size first-data) 3)
