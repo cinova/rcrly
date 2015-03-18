@@ -431,8 +431,6 @@ just the data you need. See below for an example.
 
 #### ``get-in`` [&#x219F;](#table-of-contents)
 
-[NOTE: this function is currrently getting updated to use the new output format]
-
 The utillity function ``rcrly:get-in`` is inspired by the Clojure ``get-in``
 function, but in this case, tailored to work with the rcrly results which have
 been converted from XML to LFE/Erlang data structures. With a single call, you
