@@ -87,3 +87,34 @@
   of the three-tuple."
   (one-or-all
     (element 3 (lists:keyfind key 1 data))))
+
+(defun get-linked (keys data)
+  (get-linked keys data '()))
+
+(defun get-linked (keys data options)
+  "This is a utility function similar to get-in, but instead is intended for use
+  with linked REST data (i.e., REST relational data).
+
+  This function will search nested data, assuming:
+  * the last key points to a data structure that parsed an XML element with an
+    'href' attribute (the link to the desired related REST resource)
+  * all but the last key reference nested data structures that should be
+    traversed for their contents (i.e., the third element of the 3-tuples) not
+    their attributes (the second element of the 3-tuples)"
+  (let* ((`(,all-but-last ,last) (rcrly-util:rdecons keys))
+         (link-data (get-in all-but-last data))
+         (url (find-link last link-data)))
+    (io:format "~p~n" (list last))
+    (io:format "~p~n" (list url))
+    (rcrly:get url (++ '(#(endpoint false)) options))))
+
+(defun get-link-in-3tuple (keys data)
+  (lists:foldl #'find-link/2 data keys))
+
+(defun find-link (key data)
+  "This is necesary since the proplists module requires 2-tuples only.
+
+  This function assumes that the data desired (the href for the link) is in the
+  second element of the three-tuple."
+  (let ((`(#(href ,link)) (element 2 (lists:keyfind key 1 data))))
+    link))
