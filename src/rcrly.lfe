@@ -5,7 +5,8 @@
 
 (defun start ()
   (prog1
-    `(#(gproc ,(application:start 'gproc))
+    `(#(logjam ,(logjam:setup))
+      #(gproc ,(application:start 'gproc))
       #(econfig ,(application:start 'econfig))
       #(inets ,(inets:start))
       #(ssl ,(ssl:start))
