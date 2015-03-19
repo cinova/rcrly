@@ -5,11 +5,16 @@
   (request endpoint method "" options))
 
 (defun request (endpoint method body options)
-  (request endpoint
-           method
-           (make-default-headers)
-           body
-           options))
+  (let ((headers (make-default-headers)))
+    (logjam:debug (MODULE)
+                  'request/4
+                  "Using default headers:~n~p"
+                  `(,headers))
+    (request endpoint
+             method
+             headers
+             body
+             options)))
 
 (defun request (endpoint method headers body options)
   (request endpoint
@@ -24,9 +29,12 @@
   "This function makes the call to the request dispatcher and checks the
   response for errors, appropriately the state of the response in the first
   element of the returned tuple."
+  (logjam:debug (MODULE) 'request/7 "Request URL: ~p" `(,endpoint))
   (let* ((return-type (proplists:get_value 'return-type options 'data))
+         (log-level (proplists:get_value 'log-level options (rcrly-cfg:get-log-level)))
+         (_ (logjam:set-level log-level))
          (raw-response (raw-request
-                         (make-url endpoint)
+                         (make-url endpoint options)
                          method
                          headers
                          body
@@ -36,9 +44,9 @@
          (status (get-response-status raw-response)))
     (case return-type
       ('data
-        `#(,status ,(data-response raw-response)))
+        `#(,status ,(data-response (parsed-response raw-response))))
       ('full
-        `#(,status ,(response raw-response)))
+        `#(,status ,(response (parsed-response raw-response))))
       ('xml
         raw-response))))
 
@@ -48,11 +56,25 @@
   ;; lhttpc can bomb out on an error with an exit, thus killing the LFE shell;
   ;; as such, we wrap it in a (try ...)
   (try
+    (prog1
       (lhttpc:request url method headers body timeout lhttpc-options)
+      (logjam:info (MODULE) 'raw-request "Successfully called lhttpc."))
     (catch (('error type stacktrace)
             ;; XXX this needs to be double-checked under various error
             ;; conditions
+            (logjam:info (MODULE)
+                         'raw-request
+                         "Error when calling lhttpc ...~nStacktrace: ~n~p"
+                         `(,stacktrace))
             `(#(error `#(lhttpc ,type ,stacktrace)))))))
+
+(defun parsed-response
+  "This function parses the XML data into LFE/Erlang data structures."
+  ((`#(ok #(,status ,headers ,body)))
+   (let ((parsed (rcrly-xml:parse-body body)))
+     (if (body-has-errors? parsed)
+       `#(error #(,status ,headers #(content ,body)))
+       `#(ok #(,status ,headers ,parsed))))))
 
 (defun data-response (response)
   "This function extract only the returned data in the reponse."
@@ -63,7 +85,7 @@
    `(#(response ok)
      #(status ,status)
      #(headers ,headers)
-     #(body ,(body-error-check (rcrly-xml:parse-body body) status))))
+     #(body ,body)))
   (((= `#(error ,_) error))
    ;; XXX let's find a good error and use that to refine this one
    `(#(response error)
@@ -80,23 +102,28 @@
        'error
        'ok))))
 
-(defun body-error-check
-  ((`(#(tag "errors") ,_ ,content ,_) `#(,code ,msg))
-   (error `#(code ,code message ,msg content) 'api-error))
-  ((parsed staus) parsed))
+(defun body-has-errors?
+  ((`(#(tag "errors") ,_ ,_ ,_))
+   'true)
+  ((x)
+   'false))
 
 (defun make-default-headers ()
   `(#("Accept" "application/xml")
     #("Content-Type" "application/xml; charset=utf-8")
+    #("User-Agent" ,(rcrly-cfg:user-agent))
     #("Authorization" ,(make-auth-header))))
 
 (defun make-auth-header ()
   (++ "Basic "
       (base64:encode_to_string (rcrly-cfg:get-api-key))))
 
-(defun make-url (endpoint)
-  (++ "https://"
-      (rcrly-cfg:get-host)
-      "/"
-      (rcrly-cfg:get-remote-api-version)
-      endpoint))
+(defun make-url (endpoint options)
+  (let ((is-endpoint? (proplists:get_value 'endpoint options 'true)))
+    (if is-endpoint?
+        (++ "https://"
+            (rcrly-cfg:get-host)
+            "/"
+            (rcrly-cfg:get-remote-api-version)
+            endpoint)
+        endpoint)))
