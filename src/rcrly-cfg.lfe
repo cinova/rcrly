@@ -25,6 +25,11 @@
   (->> (lcfg-log:get-local-logging)
        (proplists:get_value 'options)
        (proplists:get_value 'lager_console_backend)))
+(defun user-agent () (++ "LFE Recurly REST Client (lhttpc/Erlang)/"
+                         (rcrly-util:get-version)
+                         " (+http://github.com/"
+                         (proplists:get_value 'github (lcfg-proj:get-repos))
+                         ")"))
 
 ;;; General config functions
 
