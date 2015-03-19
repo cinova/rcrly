@@ -22,6 +22,7 @@
     * [Format](#format-)
     * [get-data](#get-data-)
     * [get-in](#get-in-)
+    * [get-linked](#get-linked-)
     * [Batched Results and Paging](#batched-results-and-paging-)
     * [Relationships and Linked Data](#relationships-and-linked-data-)
   * [Handling Errors](#handling-errors-)
@@ -212,8 +213,12 @@ functions:
 * ``follow-links`` - [NOT YET SUPPORTED] a boolean representing whether linked
   data should be automatically quereied and added to the results; defaults to
   ``false``.
-* ``return-type`` - what format the client calls shoudl take. Can be one of
+* ``return-type`` - what format the client calls should take. Can be one of
   ``data``, ``full``, or ``xml``; the default  is ``data``.
+* ``log-level`` - sets the log level on-the-fly, for easy debugging on a
+  per-request basis
+* ``endpoint`` - whether the request being made is against an API endpoint
+  or a raw URL (defaults to ``true``)
 
 
 ##### ``batch-size`` [&#x219F;](#table-of-contents)
@@ -230,7 +235,7 @@ When the ``return-type`` is set to ``data`` (the default), the data from the
 response is what is returned:
 
 ```lisp
-> (rcrly:get-account 1 `(#(return-type data)))
+> (rcrly:get-account 1 '(#(return-type data)))
 #(ok
   (#(adjustments ...)
    #(invoices ...)
@@ -246,7 +251,7 @@ When the ``return-type`` is set to ``full``, the response is annotated and
 returned:
 
 ```lisp
-> (rcrly:get-account 1 `(#(return-type full)))
+> (rcrly:get-account 1 '(#(return-type full)))
 #(ok
   (#(response ok)
    #(status #(200 "OK"))
@@ -272,7 +277,7 @@ When the ``return-type`` is set to ``xml``, the "raw" binary value is returned,
 as it is obtained from ``lhttpc``, without modification or any parsing:
 
 ```lisp
-> (rcrly:get-account 1 `(#(return-type xml)))
+> (rcrly:get-account 1 '(#(return-type xml)))
 #(ok
   #(#(200 "OK")
     (#("strict-transport-security" "max-age=15768000; includeSubDomains")
@@ -281,6 +286,34 @@ as it is obtained from ``lhttpc``, without modification or any parsing:
      ...)
     #B(60 63 120 109 108 32 118 101 114 115 105 111 110  ...)))
 ```
+
+##### ``log-level`` [&#x219F;](#table-of-contents)
+
+```lisp
+(rcrly:get-account 1 '(#(log-level debugl)))
+```
+
+##### ``endpoint`` [&#x219F;](#table-of-contents)
+
+If you wish to make a request to a full URL, you will need to pass the option
+``#(endpoint false)`` to override the default behaviour of the rcrly library
+creating the URL for you, based upon the provided endpoint.
+
+In other words, one would normally make this sort of call:
+
+```lisp
+> (rcrly:get "/some/recurly/endpoint")
+```
+
+And the ``endpoint`` option is needed if you want to access a full URL:
+
+```lisp
+> (set options '(#(endpoint false)))
+> (rcrly:get "https://some.domain/path/to/resource" options)
+```
+
+
+##### Options for lhttpc [&#x219F;](#table-of-contents)
 
 If you wish to pass general HTTP client options to lhttpc, then you will need to use
 ``rcrly-httpc:request/7``, which takes the following arguments:
@@ -460,6 +493,30 @@ The ``city`` field is nested in the ``address`` field. The ``address`` data
 is nested in the ``account``.
 
 
+#### ``get-linked`` [&#x219F;](#table-of-contents)
+
+
+In the Recurly REST API, data relationships are encoded in media links, per
+common best REST practices. Linked data may be retreived easily using the
+``get-linked/2`` utility function (analog to the ``get-in/2`` function).
+
+Here's an example showing getting account data, and then getting data
+which is linked to the account data via ``href``s:
+
+```lisp
+> (set `#(ok ,account) (rcrly:get-account 1))
+#(ok
+  #(account ...))
+> (rcrly:get-linked '(account transactions) account)
+#(ok
+  #(transactions
+    (#(type "array"))
+    (#(transaction ...)
+     #(transaction ...)
+     #(transaction ...)
+     ...)))
+```
+
 #### Batched Results and Paging [&#x219F;](#table-of-contents)
 
 TBD
@@ -467,7 +524,11 @@ TBD
 
 #### Relationships and Linked Data [&#x219F;](#table-of-contents)
 
-TBD
+In the Recurly REST API, data relationships are encoded in media links, per
+common best REST practices. Linked data may be retreived easily using the
+``get-linked/2`` utility function (analog to the ``get-in/2`` function).
+
+For more information, see the ``get-linked`` section above.
 
 
 ### Handling Errors [&#x219F;](#table-of-contents)
@@ -477,7 +538,8 @@ Recurly are a tuple of either ``#(ok ...)`` or ``#(error ...)``. All processing
 of rcrly results should pattern match against these typles, handling the error
 cases as appropriate for the application using the rcrly library.
 
-#### Recurly Errors
+
+#### Recurly Errors [&#x219F;](#table-of-contents)
 
 The Recurly API will return errors under various circumstances. For instance,
 an error is returned when attempting to look up billing information with a
@@ -534,7 +596,26 @@ be converted by rcrly to an application error:
 
 ### Logging [&#x219F;](#table-of-contents)
 
-TBD
+rcrly uses the LFE logjam library for logging. The log level may be configured
+in two places:
+
+* an ``lfe.config`` file (this is the standard location for logjam)
+* on a per-request basis in the ``options`` arguement to API calls
+
+The default log level is ``emergency``, so you should never notice it's there
+(unless, of course, you have lots ot logging defined for the ``emergency``
+level ...). The intended use for rcrly logging is on a per-request basis for
+debugging purposes (though, of course, this may be easily overridden in your
+application code by setting the log level you desire in the ``lfe.config``
+file).
+
+Note that when passing the ``log-level`` option in an API call, it sets the
+log level for the logging service which is running in the background. As such,
+the ``log-level`` option does not need to be passed again until you wish to
+change it. In other words, when passed as an option, it is set for all future
+API calls.
+
+For more details on logging per-request, see the "Options" section above.
 
 
 ### The API [&#x219F;](#table-of-contents)
@@ -678,3 +759,4 @@ Recurly [Transactions documentation](https://docs.recurly.com/api/transactions)
 ##### ``get-all-transactions``
 
 ##### ``get-transactions``
+
