@@ -53,6 +53,8 @@
 
 ;;; API functions
 
+;;; Account API
+
 (defun get-accounts ()
   (get-accounts '()))
 
@@ -66,6 +68,8 @@
   (get (++ "/accounts/"
            (rcrly-util:arg->str id))
        client-options))
+
+;;; Adjustment API
 
 (defun get-adjustments (account-id)
   (get-adjustments account-id '()))
@@ -83,6 +87,8 @@
   (get (++ "/adjustments/"
            (rcrly-util:arg->str uuid))
        client-options))
+
+;;; Billing API
 
 (defun get-billing-info (account-id)
   (get-billing-info account-id '()))
@@ -103,6 +109,8 @@
        data
        client-options))
 
+;;; Invoice API
+
 (defun get-all-invoices ()
   (get-all-invoices '()))
 
@@ -117,6 +125,16 @@
            (rcrly-util:arg->str account-id)
            "/invoices")
        client-options))
+
+;;; Plan API
+
+(defun create-plan (data)
+  (create-plan data '()))
+
+(defun create-plan (data client-options)
+  (post "/plans" data client-options))
+
+;;; Transaction API
 
 (defun get-all-transactions ()
   (get-all-transactions '()))

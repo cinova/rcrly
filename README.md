@@ -39,7 +39,7 @@
     * Coupons
     * Coupon Redemptions
     * [Invoices](#invoices-)
-    * Plans
+    * [Plans](#plans-)
     * Plan Add-ons
     * Subscriptions
     * [Transactions](#transactions-)
@@ -799,6 +799,8 @@ Takes an account id.
 ##### ``update-billing-info``
 
 ```lisp
+> (slurp "src/rcrly-xml.lfe")
+#(ok rcrly-xml)
 > (set account-id 1)
 1
 > (set payload
@@ -840,6 +842,47 @@ Recurly [Invoices documentation](https://docs.recurly.com/api/invoices)
 ##### ``get-all-invoices``
 
 ##### ``get-invoices``
+
+#### Plans [&#x219F;](#table-of-contents)
+
+Recurly [Invoices documentation](https://docs.recurly.com/api/plans)
+
+##### ``get-plans``
+
+##### ``get-plan``
+
+##### ``create-plan``
+
+```lisp
+> (slurp "src/rcrly-xml.lfe")
+#(ok rcrly-xml)
+> (set payload
+    (xml/plan
+      (list
+        (xml/plan_code "gold")
+        (xml/name "Gold plan")
+        (xml/setup_fee_in_cents
+          (list
+            (xml/USD "1000")
+            (xml/EUR "800")))
+        (xml/unit_amount_in_cents
+          (list
+            (xml/USD "6000")
+            (xml/EUR "4500")))
+        (xml/plan_interval_length "1")
+        (xml/plan_interval_unit "months")
+        (xml/tax_exempt "false"))))
+"<plan>...</plan>"
+> (set `#(ok ,plan) (rcrly:create-plan payload))
+#(ok
+  #(plan ...))
+> (rcrly:get-in '(plan setup_fee_in_cents EUR) plan)
+"4500"
+```
+
+##### ``update-plan``
+
+##### ``delete-plan``
 
 #### Transactions [&#x219F;](#table-of-contents)
 
