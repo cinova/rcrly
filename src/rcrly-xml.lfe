@@ -2,6 +2,7 @@
   (export all))
 
 (include-lib "lutil/include/compose.lfe")
+(include-lib "rcrly/include/xml.lfe")
 
 (defun parse-body (body)
   (parse-body body '()))
