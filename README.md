@@ -800,7 +800,7 @@ Takes an account id.
 
 ```lisp
 > (set account-id 1)
-b
+1
 > (set payload
     (xml/billing_info
         (list (xml/first_name "Verena")
