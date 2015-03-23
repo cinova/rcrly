@@ -798,7 +798,7 @@ Takes an account id.
 
 ##### ``update-billing-info``
 
-Firt, pull in the XML macros:
+First, pull in the XML macros:
 
 ```lisp
 > (slurp "src/rcrly-xml.lfe")
@@ -866,7 +866,7 @@ Recurly [Invoices documentation](https://docs.recurly.com/api/plans)
 
 ##### ``create-plan``
 
-Firt, pull in the XML macros:
+First, pull in the XML macros:
 
 ```lisp
 > (slurp "src/rcrly-xml.lfe")
