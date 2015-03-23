@@ -560,7 +560,9 @@ This also works for modules that will be genereating XML payloads: simply
 
 And then they will be available in your module.
 
-Here's a sample payload from the [Recurly docs](https://docs.recurly.com/api/billing-info#update-billing-info-credit-card):
+Here's a sample payload from the
+[Recurly docs](https://docs.recurly.com/api/billing-info#update-billing-info-credit-card)
+(note that multiple children need to be wrapped in a ``list``):
 
 ```lisp
 > (xml/billing_info
@@ -792,6 +794,43 @@ Takes an account id.
 ```lisp
 > (rcrly:get-in '(billing_info card_type) info)
 "Visa"
+```
+
+##### ``update-billing-info``
+
+```lisp
+> (set account-id 1)
+b
+> (set payload
+    (xml/billing_info
+        (list (xml/first_name "Verena")
+              (xml/last_name "Example"))))
+"<billing_info> ... </billing_info>"
+> (set `#(ok ,info) (rcrly:update-billing-info account-id payload))
+#(ok
+  #(billing_info
+    (#(type "credit_card")
+     #(href "https://yourname.recurly.com/v2/accounts/1/billing_info"))
+    (#(account (#(href "https://yourname.recurly.com/v2/accounts/1")) ())
+     ...
+     #(company (#(nil "nil")) ())
+     #(address1 () ("108 Main St"))
+     ...
+     #(city () ("Fairville"))
+     #(state () ("WI"))
+     #(zip () ("12345"))
+     ...
+     #(card_type () ("Visa"))
+     #(year (#(type "integer")) ("2016"))
+     #(month (#(type "integer")) ("3"))
+     ...)))
+```
+
+And we can easily confirm that our results have the updated data:
+
+```lisp
+> (rcrly:get-in '(billing_info first_name) info)
+"Verena"
 ```
 
 #### Invoices [&#x219F;](#table-of-contents)

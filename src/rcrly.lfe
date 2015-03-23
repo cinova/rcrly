@@ -31,6 +31,16 @@
     ""
     client-options))
 
+(defun put (endpoint data)
+  (post endpoint data '()))
+
+(defun put (endpoint data client-options)
+  (rcrly-httpc:request
+    endpoint
+    "PUT"
+    data
+    client-options))
+
 (defun post (endpoint data)
   (post endpoint data '()))
 
@@ -81,6 +91,16 @@
   (get (++ "/accounts/"
            (rcrly-util:arg->str account-id)
            "/billing_info")
+       client-options))
+
+(defun update-billing-info (account-id data)
+  (update-billing-info account-id data '()))
+
+(defun update-billing-info (account-id data client-options)
+  (put (++ "/accounts/"
+           (rcrly-util:arg->str account-id)
+           "/billing_info")
+       data
        client-options))
 
 (defun get-all-invoices ()
