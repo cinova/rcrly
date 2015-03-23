@@ -25,6 +25,7 @@
     * [get-linked](#get-linked-)
     * [Batched Results and Paging](#batched-results-and-paging-)
     * [Relationships and Linked Data](#relationships-and-linked-data-)
+  * [Creating Payloads](#creating-payloads-)
   * [Handling Errors](#handling-errors-)
     * [Recurly Errors](#recurly-errors-)
     * [HTTP Errors](#http-errors-)
@@ -529,6 +530,55 @@ common best REST practices. Linked data may be retreived easily using the
 ``get-linked/2`` utility function (analog to the ``get-in/2`` function).
 
 For more information, see the ``get-linked`` section above.
+
+### Creating Payloads [&#x219F;](#table-of-contents)
+
+Payloads for ``PUT`` and ``POST`` data in the Recurly REST API are XML
+documents. As such, we need to be able to create XML for such things as
+update actions. To facilitate this, The LFE rcrly library provides
+XML-generating macros. in the REPL, you can ``slurp`` the ``rcrly-xml``
+module, and then have access to them. For instance:
+
+```lisp
+> (slurp "src/rcrly-xml.lfe")
+#(ok rcrly-xml)
+```
+
+Now you can use the rcrly macros to create XML in LFE syntax:
+
+```lisp
+> (xml/account (xml/company_name "Bob's Red Mill"))
+"<account><company_name>Bob's Red Mill</company_name></account>"
+```
+
+This also works for modules that will be genereating XML payloads: simply
+``include-lib`` them like they are in ``rcrly-xml``:
+
+```lisp
+(include-lib "rcrly/include/xml.lfe")
+```
+
+And then they will be available in your module.
+
+Here's a sample payload from the [Recurly docs](https://docs.recurly.com/api/billing-info#update-billing-info-credit-card):
+
+```lisp
+> (xml/billing_info
+    (list (xml/first_name "Verena")
+          (xml/last_name "Example")
+          (xml/number "4111-1111-1111-1111")
+          (xml/verification_value "123")
+          (xml/month "11")
+          (xml/year "2015")))
+"<billing_info>
+  <first_name>Verena</first_name>
+  <last_name>Example</last_name>
+  <number>4111-1111-1111-1111</number>
+  <verification_value>123</verification_value>
+  <month>11</month>
+  <year>2015</year>
+</billing_info>"
+```
 
 
 ### Handling Errors [&#x219F;](#table-of-contents)
