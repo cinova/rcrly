@@ -798,9 +798,16 @@ Takes an account id.
 
 ##### ``update-billing-info``
 
+Firt, pull in the XML macros:
+
 ```lisp
 > (slurp "src/rcrly-xml.lfe")
 #(ok rcrly-xml)
+```
+
+Now set some argument values (simply done here to keep things more readable):
+
+```lisp
 > (set account-id 1)
 1
 > (set payload
@@ -808,6 +815,12 @@ Takes an account id.
         (list (xml/first_name "Verena")
               (xml/last_name "Example"))))
 "<billing_info> ... </billing_info>"
+```
+
+And with those in place, you can made your API call to update the billing
+info:
+
+```lisp
 > (set `#(ok ,info) (rcrly:update-billing-info account-id payload))
 #(ok
   #(billing_info
@@ -853,9 +866,16 @@ Recurly [Invoices documentation](https://docs.recurly.com/api/plans)
 
 ##### ``create-plan``
 
+Firt, pull in the XML macros:
+
 ```lisp
 > (slurp "src/rcrly-xml.lfe")
 #(ok rcrly-xml)
+```
+
+Now create your payload:
+
+```lisp
 > (set payload
     (xml/plan
       (list
@@ -873,9 +893,19 @@ Recurly [Invoices documentation](https://docs.recurly.com/api/plans)
         (xml/plan_interval_unit "months")
         (xml/tax_exempt "false"))))
 "<plan>...</plan>"
+```
+
+Now make the API call to create the plan:
+
+```lisp
 > (set `#(ok ,plan) (rcrly:create-plan payload))
 #(ok
   #(plan ...))
+```
+
+With the plan created, we can extract data from the results:
+
+```lisp
 > (rcrly:get-in '(plan setup_fee_in_cents EUR) plan)
 "4500"
 ```
@@ -883,6 +913,12 @@ Recurly [Invoices documentation](https://docs.recurly.com/api/plans)
 ##### ``update-plan``
 
 ##### ``delete-plan``
+
+To delete a plan, simply pass the plan code to ``delete-plan``:
+
+```lisp
+> (set `#(ok ,results) (rcrly:delete-plan "gold"))
+```
 
 #### Transactions [&#x219F;](#table-of-contents)
 

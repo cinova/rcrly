@@ -51,6 +51,16 @@
     data
     client-options))
 
+(defun delete (endpoint)
+  (delete endpoint '()))
+
+(defun delete (endpoint client-options)
+  (rcrly-httpc:request
+    endpoint
+    "DELETE"
+    ""
+    client-options))
+
 ;;; API functions
 
 ;;; Account API
@@ -133,6 +143,14 @@
 
 (defun create-plan (data client-options)
   (post "/plans" data client-options))
+
+(defun delete-plan (plan-code)
+  (delete-plan plan-code '()))
+
+(defun delete-plan (plan-code client-options)
+  (delete (++ "/plans/"
+              (rcrly-util:arg->str plan-code))
+          client-options))
 
 ;;; Transaction API
 
