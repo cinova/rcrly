@@ -71,12 +71,12 @@
 (defun get-accounts (client-options)
   (get "/accounts" client-options))
 
-(defun get-account (id)
-  (get-account id '()))
+(defun get-account (account-id)
+  (get-account account-id '()))
 
-(defun get-account (id client-options)
+(defun get-account (account-id client-options)
   (get (++ "/accounts/"
-           (rcrly-util:arg->str id))
+           (rcrly-util:arg->str account-id))
        client-options))
 
 (defun create-account(data)
@@ -84,6 +84,15 @@
 
 (defun create-account (data client-options)
   (post "/accounts" data client-options))
+
+(defun update-account (account-id data)
+  (update-account account-id data '()))
+
+(defun update-account (account-id data client-options)
+  (put (++ "/accounts/"
+           (rcrly-util:arg->str account-id))
+       data
+       client-options))
 
 ;;; Adjustment API
 

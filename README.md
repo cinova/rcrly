@@ -751,6 +751,43 @@ With the planaccount created, we can extract data from the results:
 "alice@example.com"
 ```
 
+##### ``update-account``
+
+Takes account id and payload data.
+
+To use from the REPL, first, pull in the XML macros:
+
+```lisp
+> (slurp "src/rcrly-xml.lfe")
+#(ok rcrly-xml)
+```
+
+Now create your payload:
+
+```lisp
+> (set payload
+    (xml/account
+        (xml/company_name "Alice's Hacker Cafe")))
+"<account>...</account>"
+```
+
+Now make the API call to create the account:
+
+```lisp
+> (set `#(ok ,account) (rcrly:update-account 123 payload))
+#(ok
+  #(account ...))
+```
+
+With the planaccount created, we can extract data from the results:
+
+```lisp
+> (rcrly:get-in '(account email) account)
+"alice@example.com"
+> (rcrly:get-in '(account company_name) account)
+"Alice's Hacker Cafe"
+```
+
 #### Adjustments [&#x219F;](#table-of-contents)
 
 Recurly [Adjustments documentation](https://docs.recurly.com/api/adjustments)
