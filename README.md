@@ -712,6 +712,45 @@ the provided id.
 "Fairville"
 ```
 
+##### ``create-account``
+
+Takes payload data.
+
+To use from the REPL, first, pull in the XML macros:
+
+```lisp
+> (slurp "src/rcrly-xml.lfe")
+#(ok rcrly-xml)
+```
+
+Now create your payload:
+
+```lisp
+> (set payload
+    (xml/account
+      (list
+        (xml/account_code "123")
+        (xml/email "alice@example.com")
+        (xml/first_name "Alice")
+        (xml/last_name "Guthrie"))))
+"<account>...</account>"
+```
+
+Now make the API call to create the account:
+
+```lisp
+> (set `#(ok ,account) (rcrly:create-account payload))
+#(ok
+  #(account ...))
+```
+
+With the planaccount created, we can extract data from the results:
+
+```lisp
+> (rcrly:get-in '(account email) account)
+"alice@example.com"
+```
+
 #### Adjustments [&#x219F;](#table-of-contents)
 
 Recurly [Adjustments documentation](https://docs.recurly.com/api/adjustments)
@@ -798,7 +837,9 @@ Takes an account id.
 
 ##### ``update-billing-info``
 
-First, pull in the XML macros:
+Takes payload data.
+
+To use from the REPL, first pull in the XML macros:
 
 ```lisp
 > (slurp "src/rcrly-xml.lfe")
@@ -866,7 +907,9 @@ Recurly [Invoices documentation](https://docs.recurly.com/api/plans)
 
 ##### ``create-plan``
 
-First, pull in the XML macros:
+Takes payload data.
+
+To use from the REPL, first, pull in the XML macros:
 
 ```lisp
 > (slurp "src/rcrly-xml.lfe")

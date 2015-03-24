@@ -79,6 +79,12 @@
            (rcrly-util:arg->str id))
        client-options))
 
+(defun create-account(data)
+  (create-account data '()))
+
+(defun create-account (data client-options)
+  (post "/accounts" data client-options))
+
 ;;; Adjustment API
 
 (defun get-adjustments (account-id)
