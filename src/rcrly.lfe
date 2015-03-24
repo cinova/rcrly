@@ -169,6 +169,14 @@
            "/invoices")
        client-options))
 
+(defun get-invoice (invoice-id)
+  (get-invoice invoice-id '()))
+
+(defun get-invoice (invoice-id client-options)
+  (get (++ "/invoices/"
+           (rcrly-util:arg->str invoice-id))
+       client-options))
+
 ;;; Plan API
 
 (defun create-plan (data)

@@ -945,13 +945,53 @@ And we can easily confirm that our results have the updated data:
 "Verena"
 ```
 
+##### ``clear-billing-info``
+
 #### Invoices [&#x219F;](#table-of-contents)
 
 Recurly [Invoices documentation](https://docs.recurly.com/api/invoices)
 
 ##### ``get-all-invoices``
 
+Takes no arguments:
+
+```lisp
+> (set `#(ok ,invoices) (rcrly:get-all-invoices))
+#(ok
+  #(invoices ...))
+```
+
 ##### ``get-invoices``
+
+Takes an account id:
+
+```lisp
+> (set `#(ok ,invoices) (rcrly:get-invoices 123))
+#(ok
+  #(invoices ...))
+```
+
+##### ``get-invoice``
+
+Takes an invoice number:
+
+```lisp
+> (set `(#(ok ,invoice)) (rcrly:get-invoice 1402))
+```
+
+##### ``get-invoice-pdf``
+
+##### ``preview-invoice``
+
+##### ``invoice``
+
+##### ``set-paid-invoice``
+
+##### ``set-failed-invoice``
+
+##### ``set-line-refund-invoice``
+
+##### ``set-open-refund-invoice``
 
 #### Plans [&#x219F;](#table-of-contents)
 
