@@ -976,7 +976,9 @@ Takes an account id:
 Takes an invoice number:
 
 ```lisp
-> (set `(#(ok ,invoice)) (rcrly:get-invoice 1402))
+> (set `#(ok ,invoice) (rcrly:get-invoice 1402))
+#(ok
+  #(invoice ...))
 ```
 
 ##### ``get-invoice-pdf``
@@ -999,7 +1001,30 @@ Recurly [Invoices documentation](https://docs.recurly.com/api/plans)
 
 ##### ``get-plans``
 
+Takes no arguments:
+
+```lisp
+> (set `#(ok ,plans) (rcrly:get-plans))
+#(ok
+  #(plans
+    (#(type "array"))
+    (#(plan ...))))
+```
+
 ##### ``get-plan``
+
+Takes a plan code:
+
+```lisp
+> (set `#(ok ,plan) (rcrly:get-plan 1402))
+#(ok
+  #(plan ...))
+```
+
+```lisp
+> (rcrly:get-in '(plan name) plan)
+"30-Day Free Trial"
+```
 
 ##### ``create-plan``
 

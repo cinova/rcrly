@@ -179,6 +179,20 @@
 
 ;;; Plan API
 
+(defun get-plans ()
+  (get-plans '()))
+
+(defun get-plans (client-options)
+  (get "/plans" client-options))
+
+(defun get-plan (plan-id)
+  (get-plan plan-id '()))
+
+(defun get-plan (plan-id client-options)
+  (get (++ "/plans/"
+           (rcrly-util:arg->str plan-id))
+       client-options))
+
 (defun create-plan (data)
   (create-plan data '()))
 
