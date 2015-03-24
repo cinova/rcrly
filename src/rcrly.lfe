@@ -207,6 +207,58 @@
               (rcrly-util:arg->str plan-code))
           client-options))
 
+;;; Subscription API
+
+(defun get-all-subscriptions ()
+  (get-all-subscriptions '()))
+
+(defun get-all-subscriptions (client-options)
+  (get "/subscriptions" client-options))
+
+(defun get-subscriptions (account-id)
+  (get-subscriptions account-id '()))
+
+(defun get-subscriptions (account-id client-options)
+  (get (++ "/accounts/"
+           (rcrly-util:arg->str account-id)
+           "/subscriptions")
+       client-options))
+
+(defun get-subscription (subscription-uuid)
+  (get-subscription subscription-uuid '()))
+
+(defun get-subscription (subscription-uuid client-options)
+  (get (++ "/subscriptions/"
+           subscription-uuid)
+       client-options))
+
+(defun create-subscription (data)
+  (create-subscription data '()))
+
+(defun create-subscription (data client-options)
+  (post "/subscriptions" data client-options))
+
+(defun update-subscription (subscription-uuid data)
+  (update-subscription subscription-uuid data '()))
+
+(defun update-subscription (subscription-uuid data client-options)
+  (put (++ "/subscriptions/"
+           subscription-uuid)
+       data
+       client-options))
+
+(defun terminate-subscription (subscription-uuid)
+  (terminate-subscription subscription-uuid '()))
+
+(defun terminate-subscription (subscription-uuid client-options)
+  (put (++ "/subscriptions/"
+           subscription-uuid
+           "/terminate"
+           ;; XXX add options for termination type
+           ;; See related issue: https://github.com/cinova/rcrly/issues/3
+           )
+       client-options))
+
 ;;; Transaction API
 
 (defun get-all-transactions ()

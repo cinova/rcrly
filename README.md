@@ -41,7 +41,7 @@
     * [Invoices](#invoices-)
     * [Plans](#plans-)
     * Plan Add-ons
-    * Subscriptions
+    * [Subscriptions](#subscriptions-)
     * [Transactions](#transactions-)
 
 
@@ -1084,6 +1084,150 @@ To delete a plan, simply pass the plan code to ``delete-plan``:
 > (set `#(ok ,results) (rcrly:delete-plan "gold"))
 [response TBD]
 ```
+
+#### Subscriptions [&#x219F;](#table-of-contents)
+
+##### ``get-all-subscriptions``
+
+Takes no arguments.
+
+```lisp
+> (set `#(ok ,subs) (rcrly:get-all-subscriptions '()))
+#(ok
+  #(subscriptions
+    (#(type "array"))
+    (#(subscription ...))))
+```
+
+##### ``get-subscriptions``
+
+Takes an account id:
+
+```lisp
+> (set `#(ok ,subs) (rcrly:get-subscriptions 123))
+#(ok
+  #(subscriptions
+    (#(type "array"))
+    (#(subscription ...))))
+```
+
+##### ``get-subscription``
+
+Takes a subscription UUID:
+
+```lisp
+> (set uuid "2dbc6c2cb823174353853a409c90d419")
+"2dbc6c2cb823174353853a409c90d419"
+> (set `#(ok ,subs) (rcrly:get-subscription uuid))
+#(ok
+  #(subscription ...))
+```
+
+Extract data as needed:
+
+
+```lisp
+> (rcrly:get-in '(subscription current_period_started_at) subs)
+"2015-03-24T21:12:14Z"
+```
+
+##### ``create-subscription``
+
+Takes payload data.
+
+To use from the REPL, first, pull in the XML macros:
+
+```lisp
+> (slurp "src/rcrly-xml.lfe")
+#(ok rcrly-xml)
+```
+
+Now create your payload:
+
+```lisp
+> (set payload
+    (xml/subscription
+      (list
+        (xml/plan_code "gold")
+        (xml/currency "USD")
+        (xml/account
+          (xml/account_code "123")))))
+"<subscription>...</subscription>"
+```
+
+Now make the API call to create the plan:
+
+```lisp
+> (set `#(ok ,subs) (rcrly:create-subscription payload))
+#(ok
+  #(subscription ...))
+```
+
+With the plan created, we can extract data from the results:
+
+```lisp
+> (rcrly:get-in '(subscription plan name) subs)
+"Gold plan"
+```
+
+##### ``preview-subscription``
+
+##### ``update-subscription``
+
+Takes subscription UUID and payload data.
+
+To use from the REPL, first, pull in the XML macros:
+
+```lisp
+> (slurp "src/rcrly-xml.lfe")
+#(ok rcrly-xml)
+```
+
+Now create your payload:
+
+```lisp
+> (set uuid "2dbc6c2cb823174353853a409c90d419")
+"2dbc6c2cb823174353853a409c90d419"
+> (set payload
+    (xml/subscription
+      (list
+        (xml/timeframe "now")
+        (xml/plan_code "silver"))))
+"<subscription>...</subscription>"
+```
+
+Now make the API call to create the plan:
+
+```lisp
+> (set `#(ok ,subs) (rcrly:update-subscription uuid payload))
+#(ok
+  #(subscription ...))
+```
+
+With the plan created, we can extract data from the results:
+
+```lisp
+> (rcrly:get-in '(subscription plan name) subs)
+"Silver plan"
+```
+
+##### ``update-subscription-notes``
+
+##### ``cancel-subscription``
+
+##### ``reactivate-subscription``
+
+##### ``terminate-subscription``
+
+Takes a subscription UUID:
+
+```lisp
+> (set uuid "2dbc6c2cb823174353853a409c90d419")
+"2dbc6c2cb823174353853a409c90d419"
+> (rcrly:terminate-subscription uuid)
+```
+
+##### ``postpone-subscription``
 
 #### Transactions [&#x219F;](#table-of-contents)
 
