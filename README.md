@@ -291,7 +291,7 @@ as it is obtained from ``lhttpc``, without modification or any parsing:
 ##### ``log-level`` [&#x219F;](#table-of-contents)
 
 ```lisp
-(rcrly:get-account 1 '(#(log-level debugl)))
+(rcrly:get-account 1 '(#(log-level debug)))
 ```
 
 ##### ``endpoint`` [&#x219F;](#table-of-contents)
@@ -795,6 +795,16 @@ Takes an account id.
 ```lisp
 > (set `#(ok) (rcrly:close-account 123))
 [response TBD]
+```
+
+##### ``reopen-account``
+
+Takes an account id.
+
+```lisp
+> (set `#(ok ,account) (rcrly:reopen-account 123))
+#(ok
+  #(account ...))
 ```
 
 #### Adjustments [&#x219F;](#table-of-contents)

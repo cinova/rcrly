@@ -102,6 +102,16 @@
               (rcrly-util:arg->str account-id))
           client-options))
 
+(defun reopen-account (account-id)
+  (reopen-account account-id '()))
+
+(defun reopen-account (account-id client-options)
+  (put (++ "/accounts/"
+           (rcrly-util:arg->str account-id)
+           "/reopen")
+       ""
+       client-options))
+
 ;;; Adjustment API
 
 (defun get-adjustments (account-id)
