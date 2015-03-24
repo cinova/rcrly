@@ -788,6 +788,15 @@ With the planaccount created, we can extract data from the results:
 "Alice's Hacker Cafe"
 ```
 
+##### ``close-account``
+
+Takes an account id.
+
+```lisp
+> (set `#(ok) (rcrly:close-account 123))
+[response TBD]
+```
+
 #### Adjustments [&#x219F;](#table-of-contents)
 
 Recurly [Adjustments documentation](https://docs.recurly.com/api/adjustments)
@@ -998,6 +1007,7 @@ To delete a plan, simply pass the plan code to ``delete-plan``:
 
 ```lisp
 > (set `#(ok ,results) (rcrly:delete-plan "gold"))
+[response TBD]
 ```
 
 #### Transactions [&#x219F;](#table-of-contents)

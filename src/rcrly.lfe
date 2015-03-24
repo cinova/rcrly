@@ -94,6 +94,14 @@
        data
        client-options))
 
+(defun close-account (account-id)
+  (close-account account-id '()))
+
+(defun close-account (account-id client-options)
+  (delete (++ "/accounts/"
+              (rcrly-util:arg->str account-id))
+          client-options))
+
 ;;; Adjustment API
 
 (defun get-adjustments (account-id)
