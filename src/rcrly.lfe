@@ -32,6 +32,10 @@
     client-options))
 
 (defun put (endpoint data)
+  "Note that put always takes at least two args: endpoint and data. Attempting
+  to pass endpoint and options will result in an error. If you wish to pass an
+  endpoint and client options, but no data, you need to use put/3 with data set
+  as an empty string."
   (put endpoint data '()))
 
 (defun put (endpoint data client-options)
@@ -245,6 +249,26 @@
   (put (++ "/subscriptions/"
            subscription-uuid)
        data
+       client-options))
+
+(defun cancel-subscription (subscription-uuid)
+  (cancel-subscription subscription-uuid '()))
+
+(defun cancel-subscription (subscription-uuid client-options)
+  (put (++ "/subscriptions/"
+           subscription-uuid
+           "/cancel")
+       ""
+       client-options))
+
+(defun reactivate-subscription (subscription-uuid)
+  (reactivate-subscription subscription-uuid '()))
+
+(defun reactivate-subscription (subscription-uuid client-options)
+  (put (++ "/subscriptions/"
+           subscription-uuid
+           "/reactivate")
+       ""
        client-options))
 
 (defun terminate-subscription (subscription-uuid)

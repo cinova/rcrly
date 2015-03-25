@@ -126,6 +126,7 @@
       (base64:encode_to_string (rcrly-cfg:get-api-key))))
 
 (defun make-url (endpoint options)
+  (logjam:debug (MODULE) 'make-url/2 "Got options: ~p" `(,options))
   (let ((is-endpoint? (proplists:get_value 'endpoint options 'true)))
     (if is-endpoint?
         (++ "https://"

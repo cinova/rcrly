@@ -1215,7 +1215,41 @@ With the plan created, we can extract data from the results:
 
 ##### ``cancel-subscription``
 
+Takes a subscription UUID:
+
+```lisp
+> (set uuid "2dbc6c2cb823174353853a409c90d419")
+"2dbc6c2cb823174353853a409c90d419"
+> (set #(ok ,subs) (rcrly:cancel-subscription uuid))
+#(ok
+  #(subscription ...))
+```
+
+And you can check the subscription state:
+
+```lisp
+> (rcrly:get-in '(subscription state) subs)
+"canceled"
+```
+
 ##### ``reactivate-subscription``
+
+Takes a subscription UUID:
+
+```lisp
+> (set uuid "2dbc6c2cb823174353853a409c90d419")
+"2dbc6c2cb823174353853a409c90d419"
+> (set #(ok ,subs) (rcrly:reactivate-subscription uuid))
+#(ok
+  #(subscription ...))
+```
+
+Check the subscription state:
+
+```lisp
+> (rcrly:get-in '(subscription state) subs)
+"active"
+```
 
 ##### ``terminate-subscription``
 
@@ -1224,7 +1258,16 @@ Takes a subscription UUID:
 ```lisp
 > (set uuid "2dbc6c2cb823174353853a409c90d419")
 "2dbc6c2cb823174353853a409c90d419"
-> (rcrly:terminate-subscription uuid)
+> (set #(ok ,subs) (rcrly:terminate-subscription uuid))
+#(ok
+  #(subscription ...))
+```
+
+Check the subscription state:
+
+```lisp
+> (rcrly:get-in '(subscription statue) subs)
+"expired"
 ```
 
 ##### ``postpone-subscription``
