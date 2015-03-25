@@ -43,6 +43,7 @@
   ((x) x))
 
 (defun get-data (results)
+  (logjam:debug (MODULE) 'get-data/1 "Got results: ~p" `(,results))
   (->> results
        (proplists:get_value 'body)
        (proplists:get_value 'content)))

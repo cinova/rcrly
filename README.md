@@ -793,8 +793,8 @@ With the planaccount created, we can extract data from the results:
 Takes an account id.
 
 ```lisp
-> (set `#(ok) (rcrly:close-account 123))
-[response TBD]
+> (set `#(ok "") (rcrly:close-account 123))
+#(ok ())
 ```
 
 ##### ``reopen-account``

@@ -58,7 +58,7 @@
   (try
     (prog1
       (lhttpc:request url method headers body timeout lhttpc-options)
-      (logjam:info (MODULE) 'raw-request "Successfully called lhttpc."))
+      (logjam:info (MODULE) 'raw-request/7 "Successfully called lhttpc."))
     (catch (('error type stacktrace)
             ;; XXX this needs to be double-checked under various error
             ;; conditions
@@ -70,10 +70,17 @@
 
 (defun parsed-response
   "This function parses the XML data into LFE/Erlang data structures."
+  ((`#(ok #(,status ,headers #B())))
+   (logjam:debug (MODULE) 'parsed-response/1 "Got empty body with 'ok'.")
+   `#(ok #(,status ,headers (#(content "")))))
+  ((`#(error #(,status ,headers #B())))
+   (logjam:debug (MODULE) 'parsed-response/1 "Got empty body with 'error'.")
+   `#(error #(,status ,headers (#(content "")))))
   ((`#(ok #(,status ,headers ,body)))
+   (logjam:debug (MODULE) 'parsed-response/1 "Got body: ~p" `(,body))
    (let ((parsed (rcrly-xml:parse-body body)))
      (if (body-has-errors? parsed)
-       `#(error #(,status ,headers #(content ,body)))
+       `#(error #(,status ,headers (#(content ,body))))
        `#(ok #(,status ,headers ,parsed))))))
 
 (defun data-response (response)
