@@ -80,7 +80,7 @@
    (logjam:debug (MODULE) 'parsed-response/1 "Got body: ~p" `(,body))
    (let ((parsed (rcrly-xml:parse-body body)))
      (if (body-has-errors? parsed)
-       `#(error #(,status ,headers (#(content ,body))))
+       `#(error #(,status ,headers ,parsed))
        `#(ok #(,status ,headers ,parsed))))))
 
 (defun data-response (response)
@@ -93,12 +93,16 @@
      #(status ,status)
      #(headers ,headers)
      #(body ,body)))
+  ((`#(error #(,status ,headers ,body)))
+   `(#(response error)
+     #(status ,status)
+     #(headers ,headers)
+     #(body ,body)))
   (((= `#(error ,_) error))
-   ;; XXX let's find a good error and use that to refine this one
    `(#(response error)
      #(status 'undefined)
      #(headers 'undefined)
-     #(body ,error))))
+     #(body (#(content ,error))))))
 
 (defun get-response-status
   (((= `#(error ,_) response))
