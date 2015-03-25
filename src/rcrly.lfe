@@ -32,7 +32,7 @@
     client-options))
 
 (defun put (endpoint data)
-  (post endpoint data '()))
+  (put endpoint data '()))
 
 (defun put (endpoint data client-options)
   (rcrly-httpc:request
@@ -257,6 +257,7 @@
            ;; XXX add options for termination type
            ;; See related issue: https://github.com/cinova/rcrly/issues/3
            )
+       ""
        client-options))
 
 ;;; Transaction API
