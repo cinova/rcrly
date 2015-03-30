@@ -1,6 +1,7 @@
 (defmodule rcrly
   (export all))
 
+(include-lib "lutil/include/compose.lfe")
 (include-lib "rcrly/include/options.lfe")
 
 (defun start ()
@@ -299,6 +300,16 @@
   (get (++ "/accounts/"
            (rcrly-util:arg->str account-id)
            "/transactions")
+       client-options))
+
+(defun get-transaction (transactions-uuid)
+  (get (++ "/transactions/"
+           (rcrly-util:arg->str transactions-uuid))
+       '()))
+
+(defun get-transaction (transactions-uuid client-options)
+  (get (++ "/transactions/"
+           (rcrly-util:arg->str transactions-uuid))
        client-options))
 
 ;;; Utility functions for this module
