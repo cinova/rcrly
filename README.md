@@ -683,8 +683,8 @@ macro, the output of the first function is added as a final argument to the
 next function):
 
 ```lisp
-> (->> (rcrly:get-accounts)        ; get-accounts gives us multi-valued result
-       (rcrly:map #'get-xacts/1)   ; this map returns a list transaction results
+> (->> (rcrly:get-accounts)        ; this returns a multi-valued result
+       (rcrly:map #'get-xacts/1)   ; this returns a list of multi-valued results
        (lists:map #'check-xacts/1) ; this returns a list of lists
        (lists:foldl #'++/2 '())    ; this flattns the list, preserving strings
        (lists:filter #'id?/1))     ; just returns results that are ids
