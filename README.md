@@ -341,6 +341,59 @@ All results in rcrly are of the form ``#(ok ...)`` or ``#(error ...)``, with the
 elided contents of those tuples changing depending upon context. This is the
 standard approach for Erlang libraries, so should be quite familiar to users.
 
+Recurly's API is XML-based; the rcrly API inherits some of its characteristics
+from this fact. In particular, data structures representing the parsed XML data
+are regularly returned by rcrly calls. Parsed rcrly results have the following:
+
+* a tag
+* attributes
+* contents (which may itself contain nested tag/attrs/contents)
+
+As such, many results are often 3-tuples. rcrly includes functions (see below)
+for working with this 3-tuple data.
+
+
+#### Multi-Valued Results
+
+By multi-valued results, we mean items in a list -- many rcrly API calls will
+return a list of items, for example, ``get-all-invoices/0``, ``get-plans/0``, or
+``get-accounts/0``. These results are of the following form:
+
+```lisp
+#(ok
+  #(accounts
+    (...) ; attributes
+    (#(account
+        (...) ; attributes
+        (...) ; child elements
+        )
+     #(account ...)
+     #(account ...)
+     ...)))
+```
+
+The rcrly library provides ``map`` and ``foldl`` functions for easily working
+with these results.
+
+
+#### Single-Valued Results
+
+By single-value results, we mean API calls which *do not* return a list of
+values, but intstead return a single-item data structure. Examples of API calls
+which do this are ``get-account/1``, ``get-billing-info/1``, ``get-plan/1``,
+etc. The results for those functions have the following form:
+
+```lisp
+#(ok
+  #(account
+    (...) ; attributes
+    (...) ; child elements
+    ))
+```
+
+The rcrly library provides functions like ``get-in`` and ``get-linked`` for
+easily working with these results.
+
 
 #### Format [&#x219F;](#table-of-contents)
 
@@ -516,6 +569,55 @@ which is linked to the account data via ``href``s:
      #(transaction ...)
      #(transaction ...)
      ...)))
+```
+
+
+#### ``map`` and ``foldl`` [&#x219F;](#table-of-contents)
+
+Recurly's API is XML-based, so parsed results have the following:
+ * a tag
+ * attributes
+ * contents (which may itself contain nested tag/attrs/contents)
+
+The ``map/2`` and ``foldl/3`` functions provided by rcrly aim to make working
+with these results easier, especially for iterating through multi-valued
+results.
+
+Here is an example usage for ``map/2`` that lists all the plan names in the
+system:
+
+```lisp
+> (rcrly:map
+    (lambda (x)
+      (rcrly:get-in '(plan name) x))
+    (rcrly:get-plans))
+```
+```
+("Silver Plan" "Gold plan" "30-Day Free Trial")
+```
+
+Here is an example for ``foldl/3`` that gets the total of all invoices
+(ignoring currency type), starting with an "add" function:
+
+```lisp
+> (defun add-invoice (invoice subtotal)
+    (+ subtotal
+      (/ (list_to_integer
+           (rcrly:get-in '(invoice total_in_cents) invoice))
+         100)))
+add-invoice
+```
+
+Now let's use that in the ``rcrly:foldl/3`` function:
+
+```lisp
+> (rcrly:foldl
+    #'add-invoice/2
+    0
+    (rcrly:get-all-invoices))
+```
+```
+120.03
 ```
 
 #### Batched Results and Paging [&#x219F;](#table-of-contents)

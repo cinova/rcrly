@@ -316,3 +316,11 @@
 
 (defun get-linked (keys results)
   (rcrly-xml:get-linked keys results))
+
+(defun map
+  ((func `#(ok #(,_tag ,_attrs ,results)))
+   (lists:map func results)))
+
+(defun foldl
+  ((func accum `#(ok #(,_tag ,_attrs ,results)))
+   (lists:foldl func accum results)))
