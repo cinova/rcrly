@@ -106,8 +106,6 @@
   (let* ((`(,all-but-last ,last) (rcrly-util:rdecons keys))
          (link-data (get-in all-but-last data))
          (url (find-link last link-data)))
-    (io:format "~p~n" (list last))
-    (io:format "~p~n" (list url))
     (rcrly:get url (++ '(#(endpoint false)) options))))
 
 (defun get-link-in-3tuple (keys data)
