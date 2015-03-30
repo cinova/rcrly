@@ -23,6 +23,7 @@
     * [get-data](#get-data-)
     * [get-in](#get-in-)
     * [get-linked](#get-linked-)
+    * [map and foldl](#map-and-foldl-)
     * [Batched Results and Paging](#batched-results-and-paging-)
     * [Relationships and Linked Data](#relationships-and-linked-data-)
   * [Creating Payloads](#creating-payloads-)
