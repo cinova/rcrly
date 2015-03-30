@@ -637,9 +637,8 @@ composition to get the following:
 
 * get a list of all the accounts
 * for each account, get all of its transactions
-* for each transaction, check to see if it's recurring
-* return the transaction id for each recurring transation which does not have a
-"success" result
+* for each transaction, check to see that it's not recurring
+* return the transaction id for each recurring transation which has a "success" state
 
 We're going to use the lutil ``->>`` macro for this, which is included in
 ``rcrly.lfe``, so we'll slurp that file:
