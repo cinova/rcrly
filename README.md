@@ -646,6 +646,7 @@ We're going to use the lutil ``->>`` macro for this, which is included in
 ```lisp
 > (slurp "src/rcrly.lfe")
 #(ok rcrly)
+>
 ```
 
 If you'd like to use the ``->>`` macro in your own modules, be sure to include
@@ -655,7 +656,7 @@ it there:
 (include-lib "lutil/include/compose.lfe")
 ```
 
-And set up some helper functions:
+We're going to need some helper functions:
 
 ```lisp
 > (defun get-xacts (acct)
@@ -674,6 +675,7 @@ check-xact
      'true)
     ((x) x))
 id?
+>
 ```
 
 Now we can perform our defined task (keep in mind that when using the ``->>``
@@ -696,15 +698,15 @@ next function):
 ```
 
 Of the 12 transactions in the accounts this was tested against, those five
-satisfied the criteria of bing non-recurring and in a successful state.
+satisfied the criteria of being non-recurring and in a successful state.
 
 This was intended to show the possibilities of composition, and the following
 should be noted about the above code:
  * by getting the accounts first, we could have performed additional checks
    against account data; and
  * if we had really wanted to check all the transactions without looking
-   at any of the account data, we would have used the ``get-all-transactions``
-   rcrly API call.
+   at any of the account data, we would have simply used the
+   ``get-all-transactions`` rcrly API call.
 
 
 #### Batched Results and Paging [&#x219F;](#table-of-contents)
