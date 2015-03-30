@@ -24,6 +24,7 @@
     * [get-in](#get-in-)
     * [get-linked](#get-linked-)
     * [map and foldl](#map-and-foldl-)
+    * [Composing Results](#composing-results-)
     * [Batched Results and Paging](#batched-results-and-paging-)
     * [Relationships and Linked Data](#relationships-and-linked-data-)
   * [Creating Payloads](#creating-payloads-)
@@ -584,6 +585,9 @@ The ``map/2`` and ``foldl/3`` functions provided by rcrly aim to make working
 with these results easier, especially for iterating through multi-valued
 results.
 
+It is important to note: ``map/2`` and ``foldl/3`` both take a *complete
+result* -- this inlcudes the ``#(ok ...)``.
+
 Here is an example usage for ``map/2`` that lists all the plan names in the
 system:
 
@@ -620,6 +624,89 @@ Now let's use that in the ``rcrly:foldl/3`` function:
 ```
 120.03
 ```
+
+
+#### Composing Results [&#x219F;](#table-of-contents)
+
+This section might be more accurately called "processing results through
+function composition" but that was a bit long. We hope you'll forgive the
+poetic license we took!
+
+With that said, here's an example of a potential "data flow" using function
+composition to get the following:
+
+* get a list of all the accounts
+* for each account, get all of its transactions
+* for each transaction, check to see if it's recurring
+* return the transaction id for each recurring transation which does not have a
+"success" result
+
+We're going to use the lutil ``->>`` macro for this, which is included in
+``rcrly.lfe``, so we'll slurp that file:
+
+```lisp
+> (slurp "src/rcrly.lfe")
+#(ok rcrly)
+```
+
+If you'd like to use the ``->>`` macro in your own modules, be sure to include
+it there:
+
+```lisp
+(include-lib "lutil/include/compose.lfe")
+```
+
+And set up some helper functions:
+
+```lisp
+> (defun get-xacts (acct)
+    (rcrly:get-linked '(account transactions) acct))
+get-xacts
+> (defun check-xacts (xacts)
+    (rcrly:map #'check-xact/1 xacts))
+check-xacts
+> (defun check-xact (xact)
+    (if (=/= (rcrly:get-in '(transaction recurring) xact) "true")
+        (if (=:= (rcrly:get-in '(transaction status) xact) "success")
+            (rcrly:get-in '(transaction uuid) xact))))
+check-xact
+> (defun id?
+    ((id) (when (is_list id))
+     'true)
+    ((x) x))
+id?
+```
+
+Now we can perform our defined task (keep in mind that when using the ``->>``
+macro, the output of the first function is added as a final argument to the
+next function):
+
+```lisp
+> (->> (rcrly:get-accounts)
+       (rcrly:map #'get-xacts/1)
+       (lists:map #'check-xacts/1)
+       (lists:foldl #'++/2 '())
+       (lists:filter #'id?/1))
+```
+```
+("2d9d1054c2716a3d38260146d28ebc7c"
+ "2dc20791440f9313a877414fe1a6f7a4"
+ "2dc2076ab55c2054cfaf3b427589437a"
+ "2dbc6c2d09c5aed53a9ede41138f63df"
+ "2dbc6c17524ca5cda869684a6bb7aae3")
+```
+
+Of the 12 transactions in the accounts this was tested against, those five
+satisfied the criteria of bing non-recurring and in a successful state.
+
+This was intended to show the possibilities of composition, and the following
+should be noted about the above code:
+ * by getting the accounts first, we could have performed additional checks
+   against account data; and
+ * if we had really wanted to check all the transactions without looking
+   at any of the account data, we would have used the ``get-all-transactions``
+   rcrly API call.
+
 
 #### Batched Results and Paging [&#x219F;](#table-of-contents)
 
