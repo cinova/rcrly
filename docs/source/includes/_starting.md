@@ -245,6 +245,7 @@ At any point you may change the log level for the client.
 ```lisp
 > (set options '(#(endpoint false)))
 > (rcrly:get "https://some.domain/path/to/resource" options)
+```
 
 If you wish to make a request to a full URL, you will need to pass the option
 ``#(endpoint false)`` to override the default behaviour of the rcrly library
@@ -259,25 +260,13 @@ TBD
 TBD
 
 
-
-
-
-
-
-
-```
-
-
 ## Options for lhttpc
 
 If you wish to pass general HTTP client options to lhttpc, then you will need to use
-``rcrly-httpc:request/7``, which takes the following arguments:
+``rcrly-httpc:request/7``, which takes the arguments ``endpoint``, ``method``,
+``headers``, ``body``, ``timeout``, ``options``, and ``lhttpc-options``.
 
-```
-endpoint method headers body timeout options lhttpc-options
-```
-
-where ``options`` are the rcrly options discussed above, and ``lhttpc-options``
+The ``options`` parameter is for the rcrly options discussed above, and ``lhttpc-options``
 are the regular lhttpc options, the most significant of which are:
 
 * ``connect_options`` - a list of terms
