@@ -1,20 +1,61 @@
-# Errors
+# Handling Errors
 
-<aside class="notice">This error section is stored in a separate file in `includes/_errors.md`. Slate allows you to optionally separate out your docs into many files...just save them to the `includes` folder and add them to the top of your `index.md`'s frontmatter. Files are included in the order listed.</aside>
+As mentioned in the "Working with Results" section, all parsed responses from
+Recurly are a tuple of either ``#(ok ...)`` or ``#(error ...)``. All processing
+of rcrly results should pattern match against these typles, handling the error
+cases as appropriate for the application using the rcrly library.
 
-The Kittn API uses the following error codes:
+
+## Recurly Errors
+
+The Recurly API will return errors under various circumstances. For instance,
+an error is returned when attempting to look up billing information with a
+non-existent account:
+
+```lisp
+> (set `#(error ,error) (rcrly:get-billing-info 'noaccountid))
+#(error
+  #(error ()
+    (#(symbol () ("not_found"))
+     #(description
+       (#(lang "en-US"))
+       ("Couldn't find Account with account_code = noaccountid")))))
+```
+
+You may use the ``get-in`` function to extract error information:
+
+```lisp
+> (rcrly:get-in '(error description) error)
+"Couldn't find Account with account_code = noaccountid"
+```
+
+## HTTP Errors
+
+Any HTTP request that generates an HTTP status code equal to or greater than
+400 will be converted to an error. For example, requesting account information
+with an id that no account has will generate a ``404 - Not Found`` which will
+be converted by rcrly to an application error:
+
+```lisp
+> (set `#(error ,error) (rcrly:get-account 'noaccountid))
+#(error
+  #(error ()
+    (#(symbol () ("not_found"))
+     #(description
+       (#(lang "en-US"))
+       ("Couldn't find Account with account_code = noaccountid")))))
+```
+```lisp
+> (rcrly:get-in '(error description) error)
+"Couldn't find Account with account_code = noaccountid"
+```
 
 
-Error Code | Meaning
----------- | -------
-400 | Bad Request -- Your request sucks
-401 | Unauthorized -- Your API key is wrong
-403 | Forbidden -- The kitten requested is hidden for administrators only
-404 | Not Found -- The specified kitten could not be found
-405 | Method Not Allowed -- You tried to access a kitten with an invalid method
-406 | Not Acceptable -- You requested a format that isn't json
-410 | Gone -- The kitten requested has been removed from our servers
-418 | I'm a teapot
-429 | Too Many Requests -- You're requesting too many kittens! Slow down!
-500 | Internal Server Error -- We had a problem with our server. Try again later.
-503 | Service Unavailable -- We're temporarially offline for maintanance. Please try again later.
+## rcrly Errors
+
+[more to come, examples, etc.]
+
+
+## lhttpc Errors
+
+[more to come, examples, etc.]
