@@ -14,7 +14,7 @@
 
 > Or, if you use ``lfe.config``:
 
-```lisp
+```cl
     #(project (#(deps (#("cinova/rcrly" "master")))))
 ```
 
@@ -70,7 +70,7 @@ API key or host this is almost certainly not what you want!
 
 > Execute the following before using rcrly, when not using the ``make`` targets which start it automatically:
 
-```lisp
+```cl
 > (rcrly:start)
 (#(gproc ok)
  #(econfig ok)
@@ -112,13 +112,13 @@ your rcrly configuration file.
 
 > Making calls from LFE are pretty standard:
 
-```lisp
+```cl
 > (rcrly:get-accounts)
 ```
 
 > Which gives results like the following:
 
-```lisp
+```cl
 #(ok
   (#(account ...)
    #(account ...)
@@ -166,8 +166,13 @@ keyword arguments. The following are supported (or planned) such options:
 > When the ``return-type`` is set to ``data`` (the default), the data from the
 response is what is returned:
 
-```lisp
+```cl
 > (rcrly:get-account 1 '(#(return-type data)))
+```
+
+> Results:
+
+```cl
 #(ok
   (#(adjustments ...)
    #(invoices ...)
@@ -182,8 +187,13 @@ response is what is returned:
 > When the ``return-type`` is set to ``full``, the response is annotated and
 returned:
 
-```lisp
+```cl
 > (rcrly:get-account 1 '(#(return-type full)))
+```
+
+> Results:
+
+```cl
 #(ok
   (#(response ok)
    #(status #(200 "OK"))
@@ -208,8 +218,13 @@ returned:
 > When the ``return-type`` is set to ``xml``, the "raw" binary value is returned,
 as it is obtained from ``lhttpc``, without modification or any parsing:
 
-```lisp
+```cl
 > (rcrly:get-account 1 '(#(return-type xml)))
+```
+
+> Results:
+
+```cl
 #(ok
   #(#(200 "OK")
     (#("strict-transport-security" "max-age=15768000; includeSubDomains")
@@ -225,7 +240,7 @@ The rcrly client library lets you specify the format of the returned results by 
 
 > Set a new log level:
 
-```lisp
+```cl
 > (rcrly:get-account 1 '(#(log-level debug)))
 ```
 
@@ -236,13 +251,13 @@ At any point you may change the log level for the client.
 
 > Normal "endpoint" call:
 
-```lisp
+```cl
 > (rcrly:get "/some/recurly/endpoint")
 ```
 
 > Set the ``endpoint`` option to ``false`` to make a direct, "URL" call:
 
-```lisp
+```cl
 > (set options '(#(endpoint false)))
 > (rcrly:get "https://some.domain/path/to/resource" options)
 ```
@@ -282,14 +297,14 @@ are the regular lhttpc options, the most significant of which are:
 
 > To demonstrate creating XML, ``slurp`` the following file:
 
-```lisp
+```cl
 > (slurp "src/rcrly-xml.lfe")
 #(ok rcrly-xml)
 ```
 
 > Now you can use the rcrly macros to create XML in LFE syntax:
 
-```lisp
+```cl
 > (xml/account (xml/company_name "Bob's Red Mill"))
 "<account><company_name>Bob's Red Mill</company_name></account>"
 ```
@@ -297,7 +312,7 @@ are the regular lhttpc options, the most significant of which are:
 > This also works for modules that will be genereating XML payloads: simply
 ``include-lib`` them like they are in ``rcrly-xml``:
 
-```lisp
+```cl
 (include-lib "rcrly/include/xml.lfe")
 ```
 
@@ -305,7 +320,7 @@ are the regular lhttpc options, the most significant of which are:
 [Recurly docs](https://docs.recurly.com/api/billing-info#update-billing-info-credit-card)
 (note that multiple children need to be wrapped in a ``list``):
 
-```lisp
+```cl
 > (xml/billing_info
     (list (xml/first_name "Verena")
           (xml/last_name "Example")
