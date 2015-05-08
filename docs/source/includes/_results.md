@@ -1,5 +1,31 @@
 # Working with Results
 
+> Example form for multi-valued results:
+
+```cl
+#(ok
+  #(accounts
+    (...) ; attributes
+    (#(account
+        (...) ; attributes
+        (...) ; child elements
+        )
+     #(account ...)
+     #(account ...)
+     ...)))
+```
+
+> Example form for single-valued results:
+
+```cl
+#(ok
+  #(account
+    (...) ; attributes
+    (...) ; child elements
+    ))
+```
+
+
 All results in rcrly are of the form ``#(ok ...)`` or ``#(error ...)``, with the
 elided contents of those tuples changing depending upon context. This is the
 standard approach for Erlang libraries, so should be quite familiar to users.
@@ -15,61 +41,27 @@ are regularly returned by rcrly calls. Parsed rcrly results have the following:
 As such, many results are often 3-tuples. rcrly includes functions (see below)
 for working with this 3-tuple data.
 
+The rcrly LFE library distinguishes between two different result types:
 
-## Multi-Valued Results
-
-By multi-valued results, we mean items in a list -- many rcrly API calls will
-return a list of items, for example, ``get-all-invoices/0``, ``get-plans/0``, or
-``get-accounts/0``. These results are of the following form:
-
-```lisp
-#(ok
-  #(accounts
-    (...) ; attributes
-    (#(account
-        (...) ; attributes
-        (...) ; child elements
-        )
-     #(account ...)
-     #(account ...)
-     ...)))
-```
-
-The rcrly library provides ``map`` and ``foldl`` functions for easily working
-with these results.
+* multi-valued
+* single-valued
 
 
-## Single-Valued Results
+Multi-valued results are simply results that have items in a lis. Many rcrly API
+calls will return a list of items, for example, ``get-all-invoices/0``,
+``get-plans/0``, or ``get-accounts/0``. The rcrly library provides ``map`` and
+``foldl`` functions for easily working with these results.
 
 By single-value results, we mean API calls which *do not* return a list of
 values, but intstead return a single-item data structure. Examples of API calls
 which do this are ``get-account/1``, ``get-billing-info/1``, ``get-plan/1``,
-etc. The results for those functions have the following form:
-
-```lisp
-#(ok
-  #(account
-    (...) ; attributes
-    (...) ; child elements
-    ))
-```
-
-The rcrly library provides functions like ``get-in`` and ``get-linked`` for
+etc. The rcrly library provides functions like ``get-in`` and ``get-linked`` for
 easily working with these results.
 
 
 ## Format
 
-As noted above, the format of the results depend upon what value you have passed
-as the ``return-type``; by default, the ``data`` type is passed and this simply
-returns the data requested by the particular API call (not the headers, HTTP
-status, body, XML conversion info, etc. -- if you want that, you'll need to pass
-the ``full`` value associated with the ``return-type``).
-
-The API calls return XML that has been parsed and converted to LFE data
-structures by the [erlsom](https://github.com/willemdj/erlsom) library.
-
-For instance, here's what a standard Recurly XML result looks like:
+> A standard Recurly XML result:
 
 ```xml
 <account href="https://yourname.recurly.com/v2/accounts/1">
@@ -103,9 +95,9 @@ For instance, here's what a standard Recurly XML result looks like:
 </account>
 ```
 
-And here is that same result from the LFE rcrly library:
+> Here is that same result as parsed by the LFE rcrly library:
 
-```lisp
+```cl
 #(account
   (#(href "https://yourname.recurly.com/v2/accounts/1"))
   (#(adjustments
@@ -142,21 +134,30 @@ And here is that same result from the LFE rcrly library:
    #(created_at (#(type "datetime")) ("2011-10-25T12:00:00"))))
 ```
 
+As noted above, the format of the results depend upon what value you have passed
+as the ``return-type``; by default, the ``data`` type is passed and this simply
+returns the data requested by the particular API call (not the headers, HTTP
+status, body, XML conversion info, etc. -- if you want that, you'll need to pass
+the ``full`` value associated with the ``return-type``).
+
+The API calls return XML that has been parsed and converted to LFE data
+structures by the [erlsom](https://github.com/willemdj/erlsom) library.
+
 The rcrly library offers a couple of convenience functions for extracting data
 from this sort of structure -- see the next two sections for more information
 about data extraction.
 
 ## ``get-data``
 
-The ``get-data`` utility function is provided in the ``rcrly`` module and is
-useful for extracing response data returned from client requests made with
-the ``full`` option. It assumes a nested property list structure with the
-``content`` key in the ``body``'s property list.
+> First, get some data using the ``full`` return type:
 
-Example usage:
-
-```lisp
+```cl
 > (set `#(ok ,results) (rcrly:get-accounts `(#(return-type full))))
+```
+
+> Results:
+
+```cl
 #(ok
   (#(response ok)
    #(status #(200 "OK"))
@@ -166,13 +167,22 @@ Example usage:
       #(attr (#(type "array")))
       #(content
         #(accounts ...))))))
+```
 
+> Example ``get-data`` call:
+
+```cl
 > (rcrly:get-data results)
 #(accounts
   (#(type "array"))
   (#(account ...)
    #(account ...)))
 ```
+   
+The ``get-data`` utility function is provided in the ``rcrly`` module and is
+useful for extracing response data returned from client requests made with
+the ``full`` option. It assumes a nested property list structure with the
+``content`` key in the ``body``'s property list.
 
 Though this is useful when dealing with response data from ``full`` the return
 type, you may find that it is more convenient to use the default ``data`` return
@@ -182,16 +192,15 @@ just the data you need. See below for an example.
 
 ## ``get-in``
 
-The utillity function ``rcrly:get-in`` is inspired by the Clojure ``get-in``
-function, but in this case, tailored to work with the rcrly results which have
-been converted from XML to LFE/Erlang data structures. With a single call, you
-are able to retrieve data which is nested at any depth, providing just the keys
-needed to locate it.
+> Get some data:
 
-Here's an example:
-
-```lisp
+```cl
 > (set `#(ok ,account) (rcrly:get-account 1))
+```
+
+> Results:
+
+```cl
 #(ok
   #(account
     (#(href ...))
@@ -202,28 +211,31 @@ Here's an example:
       #(city () ("Fairville"))
       ...))
     ...)))
+```
+
+> Example ``get-in`` call:
+
+```cl
 > (rcrly:get-in '(account address city) account)
 "Fairville"
 ```
 
-The ``city`` field is nested in the ``address`` field. The ``address`` data
+> Note that the ``city`` field is nested in the ``address`` field. The ``address`` data
 is nested in the ``account``.
+
+The utillity function ``rcrly:get-in`` is inspired by the Clojure ``get-in``
+function, but in this case, tailored to work with the rcrly results which have
+been converted from XML to LFE/Erlang data structures. With a single call, you
+are able to retrieve data which is nested at any depth, providing just the keys
+needed to locate it.
 
 
 ## ``get-linked``
 
+> Using the same account data as tthe last example, here's how you get the linked
+transactions:
 
-In the Recurly REST API, data relationships are encoded in media links, per
-common best REST practices. Linked data may be retreived easily using the
-``get-linked/2`` utility function (analog to the ``get-in/2`` function).
-
-Here's an example showing getting account data, and then getting data
-which is linked to the account data via ``href``s:
-
-```lisp
-> (set `#(ok ,account) (rcrly:get-account 1))
-#(ok
-  #(account ...))
+```cl
 > (rcrly:get-linked '(account transactions) account)
 #(ok
   #(transactions
@@ -234,8 +246,59 @@ which is linked to the account data via ``href``s:
      ...)))
 ```
 
+In the Recurly REST API, data relationships are encoded in media links, per
+common best REST practices. Linked data may be retreived easily using the
+``get-linked/2`` utility function (analog to the ``get-in/2`` function).
+``get-linked/2`` performs most of the same work that ``get-in/2`` does, with
+the exception being that the last item in the list of keys points to linked
+data. As such, ``get-linked/2`` will then perform an HTTP ``GET`` for the
+linked media.
+
 
 ## ``map`` and ``foldl``
+
+> Example ``map/2`` call that lists all the plan names in the
+system:
+
+```cl
+> (rcrly:map
+    (lambda (x)
+      (rcrly:get-in '(plan name) x))
+    (rcrly:get-plans))
+```
+
+> Results:
+
+```
+("Silver Plan" "Gold plan" "30-Day Free Trial")
+```
+
+> Example ``foldl/3`` call that gets the total of all invoices
+(ignoring currency type), starting with an "add" function:
+
+```cl
+> (defun add-invoice (invoice subtotal)
+    (+ subtotal
+      (/ (list_to_integer
+           (rcrly:get-in '(invoice total_in_cents) invoice))
+         100)))
+add-invoice
+```
+
+> Now to use that function with ``rcrly:foldl/3``:
+
+```cl
+> (rcrly:foldl
+    #'add-invoice/2
+    0
+    (rcrly:get-all-invoices))
+```
+
+> Result:
+
+```cl
+120.03
+```
 
 Recurly's API is XML-based, so parsed results have the following:
  * a tag
@@ -249,77 +312,21 @@ results.
 It is important to note: ``map/2`` and ``foldl/3`` both take a *complete
 result* -- this inlcudes the ``#(ok ...)``.
 
-Here is an example usage for ``map/2`` that lists all the plan names in the
-system:
-
-```lisp
-> (rcrly:map
-    (lambda (x)
-      (rcrly:get-in '(plan name) x))
-    (rcrly:get-plans))
-```
-```
-("Silver Plan" "Gold plan" "30-Day Free Trial")
-```
-
-Here is an example for ``foldl/3`` that gets the total of all invoices
-(ignoring currency type), starting with an "add" function:
-
-```lisp
-> (defun add-invoice (invoice subtotal)
-    (+ subtotal
-      (/ (list_to_integer
-           (rcrly:get-in '(invoice total_in_cents) invoice))
-         100)))
-add-invoice
-```
-
-Now let's use that in the ``rcrly:foldl/3`` function:
-
-```lisp
-> (rcrly:foldl
-    #'add-invoice/2
-    0
-    (rcrly:get-all-invoices))
-```
-```
-120.03
-```
 
 
 ## Composing Results
 
-This section might be more accurately called "processing results through
-function composition" but that was a bit long. We hope you'll forgive the
-poetic license we took!
+> To use the ``->>`` macro we'll need to slurp a file that has included it:
 
-With that said, here's an example of a potential "data flow" using function
-composition to get the following:
-
-* get a list of all the accounts
-* for each account, get all of its transactions
-* for each transaction, check to see that it's not recurring
-* return the transaction id for each recurring transation which has a "success" state
-
-We're going to use the lutil ``->>`` macro for this, which is included in
-``rcrly.lfe``, so we'll slurp that file:
-
-```lisp
+```cl
 > (slurp "src/rcrly.lfe")
 #(ok rcrly)
 >
 ```
 
-If you'd like to use the ``->>`` macro in your own modules, be sure to include
-it there:
+> We're going to need some helper functions:
 
-```lisp
-(include-lib "lutil/include/compose.lfe")
-```
-
-We're going to need some helper functions:
-
-```lisp
+```cl
 > (defun get-xacts (acct)
     (rcrly:get-linked '(account transactions) acct))
 get-xacts
@@ -339,17 +346,18 @@ id?
 >
 ```
 
-Now we can perform our defined task (keep in mind that when using the ``->>``
-macro, the output of the first function is added as a final argument to the
-next function):
+> Now we can perform our defined task:
 
-```lisp
+```cl
 > (->> (rcrly:get-accounts)        ; this returns a multi-valued result
        (rcrly:map #'get-xacts/1)   ; this returns a list of multi-valued results
        (lists:map #'check-xacts/1) ; this returns a list of lists
        (lists:foldl #'++/2 '())    ; this flattns the list, preserving strings
        (lists:filter #'id?/1))     ; just returns results that are ids
 ```
+
+> Results:
+
 ```
 ("2d9d1054c2716a3d38260146d28ebc7c"
  "2dc20791440f9313a877414fe1a6f7a4"
@@ -358,16 +366,42 @@ next function):
  "2dbc6c17524ca5cda869684a6bb7aae3")
 ```
 
-Of the 12 transactions in the accounts this was tested against, those five
+> Of the 12 transactions in the accounts this was tested against, those five
 satisfied the criteria of being non-recurring and in a successful state.
 
-This was intended to show the possibilities of composition, and the following
+This section might be more accurately called "processing results through
+function composition" but that was a bit long. We hope you'll forgive the
+poetic license we took!
+
+With that said, here's an example of a potential "data flow" using function
+composition to get the following:
+
+* get a list of all the accounts
+* for each account, get all of its transactions
+* for each transaction, check to see that it's not recurring
+* return the transaction id for each recurring transation which has a "success" state
+
+<aside class="success">
+If you'd like to use the ``->>`` macro in your own modules, be sure to include
+it there with ``(include-lib "lutil/include/compose.lfe")``.
+</aside>
+
+<aside class="info">
+Keep in mind that when using the ``->>``
+macro, the output of the first function is added as a final argument to the
+next function.
+</aside>
+
+<aside class="info">
+The example to the right is intended to show the possibilities of composition, and the following
 should be noted about the above code:
- * by getting the accounts first, we could have performed additional checks
-   against account data; and
- * if we had really wanted to check all the transactions without looking
+<ul><li>by getting the accounts first, we could have performed additional checks
+   against account data; and</li>
+<li>if we had really wanted to check all the transactions without looking
    at any of the account data, we would have simply used the
-   ``get-all-transactions`` rcrly API call.
+   ``get-all-transactions`` rcrly API call.</li>
+   </ul>
+</aside>
 
 
 ## Batched Results and Paging
