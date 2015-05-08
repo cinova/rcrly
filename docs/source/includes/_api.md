@@ -12,10 +12,15 @@ Recurly [Accounts documentation](https://docs.recurly.com/api/accounts)
 
 ### ``get-accounts``
 
-Get all accounts.
+> Get all accounts:
 
-```lisp
+```cl
 > (set `#(ok ,accounts) (rcrly:get-accounts))
+```
+
+> Results:
+
+```cl
 #(ok
   (#(account ...)
    #(account ...)))
@@ -23,13 +28,21 @@ Get all accounts.
 2
 ```
 
+Pages on all accounts in the system.
+
+
 ### ``get-account``
 
-Takes a single arguement and returns data for the account associated with
-the provided id.
+> Takes a single arguement and returns data for the account associated with
+the provided id:
 
-```lisp
+```cl
 > (set `#(ok ,account) (rcrly:get-account 1))
+```
+
+> Results:
+
+```cl
 #(ok
   #(account
     (#(adjustments ...)
@@ -40,20 +53,20 @@ the provided id.
 "Fairville"
 ```
 
+Get a particular account by account ID.
+
 ### ``create-account``
 
-Takes payload data.
+> To use from the REPL, first, pull in the XML macros:
 
-To use from the REPL, first, pull in the XML macros:
-
-```lisp
+```cl
 > (slurp "src/rcrly-xml.lfe")
 #(ok rcrly-xml)
 ```
 
-Now create your payload:
+> Now create your payload:
 
-```lisp
+```cl
 > (set payload
     (xml/account
       (list
@@ -61,79 +74,89 @@ Now create your payload:
         (xml/email "alice@example.com")
         (xml/first_name "Alice")
         (xml/last_name "Guthrie"))))
+```
+
+> Which will give you:
+
+```xml
 "<account>...</account>"
 ```
 
-Now make the API call to create the account:
+> Now make the API call to create the account:
 
-```lisp
+```cl
 > (set `#(ok ,account) (rcrly:create-account payload))
 #(ok
   #(account ...))
 ```
 
-With the planaccount created, we can extract data from the results:
+> With the account created, we can extract data from the results:
 
-```lisp
+```cl
 > (rcrly:get-in '(account email) account)
 "alice@example.com"
 ```
 
+Create an account based upon provided payload data.
+
+
 ### ``update-account``
 
-Takes account id and payload data.
+> Create your payload:
 
-To use from the REPL, first, pull in the XML macros:
-
-```lisp
-> (slurp "src/rcrly-xml.lfe")
-#(ok rcrly-xml)
-```
-
-Now create your payload:
-
-```lisp
+```cl
 > (set payload
     (xml/account
         (xml/company_name "Alice's Hacker Cafe")))
 "<account>...</account>"
 ```
 
-Now make the API call to create the account:
+> Now make the API call to update the account:
 
-```lisp
+```cl
 > (set `#(ok ,account) (rcrly:update-account 123 payload))
 #(ok
   #(account ...))
 ```
 
-With the planaccount created, we can extract data from the results:
+> With the account updated, we can extract data from the results:
 
-```lisp
+```cl
 > (rcrly:get-in '(account email) account)
 "alice@example.com"
 > (rcrly:get-in '(account company_name) account)
 "Alice's Hacker Cafe"
 ```
 
+This function takes account id and payload data.
+
+
 ### ``close-account``
 
-Takes an account id.
+> Close an account:
 
-```lisp
+
+```cl
 > (set `#(ok "") (rcrly:close-account 123))
 #(ok ())
 ```
 
-### ``reopen-account``
-
 Takes an account id.
 
-```lisp
+
+### ``reopen-account``
+
+
+> Re-open an account that had been closed:
+
+```cl
 > (set `#(ok ,account) (rcrly:reopen-account 123))
 #(ok
   #(account ...))
-```
+  ```
+  
+Takes an account id.
+
 
 ## Adjustments
 
@@ -141,10 +164,15 @@ Recurly [Adjustments documentation](https://docs.recurly.com/api/adjustments)
 
 ### ``get-adjustments``
 
-Takes an account id.
+> Get all adjustments:
 
-```lisp
+```cl
 > (set `#(ok ,adjustments) (rcrly:get-adjustments 1))
+```
+
+> Results:
+
+```cl
 #(ok
   #(adjustments
     (#(type "array"))
@@ -153,12 +181,19 @@ Takes an account id.
      ...)))
 ```
 
+Takes an account id.
+
 ### ``get-adjustment``
 
-Takes a UUID.
+> Get a particular adjustment:
 
-```lisp
+```cl
 > (set `#(ok ,adjustment) (rcrly:get-adjustment "2d97cfa52e80a675a532ba4e8ea25401"))
+```
+
+> Results:
+
+```cl
 #(ok
   #(adjustment
     (#(type "credit")
@@ -177,7 +212,10 @@ Takes a UUID.
      #(end_date (#(nil "nil")) ())
      #(created_at (#(type "datetime")) ("2015-03-17T18:34:56Z")))))
 ```
-```lisp
+
+> Now you can do the usual things:
+
+```cl
 > (rcrly:get-in '(adjustment total_in_cents) adjustment)
 "-100"
 > (rcrly:get-in '(adjustment state) adjustment)
@@ -186,16 +224,23 @@ Takes a UUID.
 "credit"
 ```
 
+Takes a UUID.
+
 ## Billing Info
 
 Recurly [Billing Info documentation](https://docs.recurly.com/api/billing-info)
 
 ### ``get-billing-info``
 
-Takes an account id.
+> Get billing info for a particular account:
 
-```lisp
+```cl
 > (set `#(ok ,info) (rcrly:get-billing-info 1))
+```
+
+> Results:
+
+```cl
 #(ok
   #(billing_info
     (#(type "credit_card")
@@ -214,25 +259,29 @@ Takes an account id.
      #(month (#(type "integer")) ("3"))
      ...)))
 ```
-```lisp
+
+> Extract some data:
+
+```cl
 > (rcrly:get-in '(billing_info card_type) info)
 "Visa"
 ```
 
+Takes an account id.
+
 ### ``update-billing-info``
 
-Takes payload data.
 
-To use from the REPL, first pull in the XML macros:
+To update billing info from the REPL, first pull in the XML macros:
 
-```lisp
+```cl
 > (slurp "src/rcrly-xml.lfe")
 #(ok rcrly-xml)
 ```
 
-Now set some argument values (simply done here to keep things more readable):
+> Now set some argument values (helps to keep things more readable):
 
-```lisp
+```cl
 > (set account-id 1)
 1
 > (set payload
@@ -242,11 +291,16 @@ Now set some argument values (simply done here to keep things more readable):
 "<billing_info> ... </billing_info>"
 ```
 
-And with those in place, you can made your API call to update the billing
+> With those in place, you can made your API call to update the billing
 info:
 
-```lisp
+```cl
 > (set `#(ok ,info) (rcrly:update-billing-info account-id payload))
+```
+
+> Results:
+
+```cl
 #(ok
   #(billing_info
     (#(type "credit_card")
@@ -266,14 +320,19 @@ info:
      ...)))
 ```
 
-And we can easily confirm that our results have the updated data:
+> We can easily confirm that our results have the updated data:
 
-```lisp
+```cl
 > (rcrly:get-in '(billing_info first_name) info)
 "Verena"
 ```
 
+Takes payload data.
+
 ### ``clear-billing-info``
+
+TBD
+
 
 ## Invoices
 
@@ -281,47 +340,80 @@ Recurly [Invoices documentation](https://docs.recurly.com/api/invoices)
 
 ### ``get-all-invoices``
 
-Takes no arguments:
+> Get all the invoices for all accounts:
 
-```lisp
+```cl
 > (set `#(ok ,invoices) (rcrly:get-all-invoices))
 #(ok
   #(invoices ...))
 ```
 
+Takes no arguments.
+
+
 ### ``get-invoices``
 
-Takes an account id:
+> Get all the invoices for one account:
 
-```lisp
+```cl
 > (set `#(ok ,invoices) (rcrly:get-invoices 123))
+```
+
+> Results:
+
+```cl
 #(ok
   #(invoices ...))
 ```
 
+Takes an account id.
+
+
 ### ``get-invoice``
 
-Takes an invoice number:
+> Get a particular invoice:
 
-```lisp
+```cl
 > (set `#(ok ,invoice) (rcrly:get-invoice 1402))
+```
+
+Result has the follwoing form:
+
+```cl
 #(ok
   #(invoice ...))
 ```
 
+Takes an invoice number:
+
 ### ``get-invoice-pdf``
+
+TBD
 
 ### ``preview-invoice``
 
+TBD
+
 ### ``invoice``
+
+TBD
 
 ### ``set-paid-invoice``
 
+TBD
+
 ### ``set-failed-invoice``
+
+TBD
 
 ### ``set-line-refund-invoice``
 
+TBD
+
 ### ``set-open-refund-invoice``
+
+TBD
+
 
 ## Plans
 
@@ -329,45 +421,49 @@ Recurly [Invoices documentation](https://docs.recurly.com/api/plans)
 
 ### ``get-plans``
 
-Takes no arguments:
+> Get all plans:
 
-```lisp
+```cl
 > (set `#(ok ,plans) (rcrly:get-plans))
+```
+
+> Results:
+
+```cl
 #(ok
   #(plans
     (#(type "array"))
     (#(plan ...))))
 ```
 
+Takes no arguments.
+
+
 ### ``get-plan``
 
-Takes a plan code:
+> Get a specific plan:
 
-```lisp
+```cl
 > (set `#(ok ,plan) (rcrly:get-plan 1402))
 #(ok
   #(plan ...))
 ```
 
-```lisp
+> Extract the plan name:
+
+```cl
 > (rcrly:get-in '(plan name) plan)
 "30-Day Free Trial"
 ```
 
+Takes a plan code.
+
 ### ``create-plan``
 
-Takes payload data.
 
-To use from the REPL, first, pull in the XML macros:
+> Create your payload:
 
-```lisp
-> (slurp "src/rcrly-xml.lfe")
-#(ok rcrly-xml)
-```
-
-Now create your payload:
-
-```lisp
+```cl
 > (set payload
     (xml/plan
       (list
@@ -384,42 +480,51 @@ Now create your payload:
         (xml/plan_interval_length "1")
         (xml/plan_interval_unit "months")
         (xml/tax_exempt "false"))))
+```
+```xml
 "<plan>...</plan>"
 ```
 
-Now make the API call to create the plan:
+> Now make the API call to create the plan:
 
-```lisp
+```cl
 > (set `#(ok ,plan) (rcrly:create-plan payload))
 #(ok
   #(plan ...))
 ```
 
-With the plan created, we can extract data from the results:
+> With the plan created, we can extract data from the results:
 
-```lisp
+```cl
 > (rcrly:get-in '(plan setup_fee_in_cents EUR) plan)
 "4500"
 ```
 
+Takes payload data.
+
+
 ### ``update-plan``
+
+TBD
 
 ### ``delete-plan``
 
-To delete a plan, simply pass the plan code to ``delete-plan``:
+> To delete a plan, simply pass the plan code to ``delete-plan``:
 
-```lisp
+```cl
 > (set `#(ok ,results) (rcrly:delete-plan "gold"))
 [response TBD]
 ```
 
 ## Subscriptions
 
+Recurly [InvoicesSubscriptions documentation](https://docs.recurly.com/api/subscriptions)
+
 ### ``get-all-subscriptions``
 
-Takes no arguments.
+> Get all subscriptions:
 
-```lisp
+```cl
 > (set `#(ok ,subs) (rcrly:get-all-subscriptions '()))
 #(ok
   #(subscriptions
@@ -427,11 +532,13 @@ Takes no arguments.
     (#(subscription ...))))
 ```
 
+Takes no arguments.
+
 ### ``get-subscriptions``
 
-Takes an account id:
+> Get all subscriptions for an account:
 
-```lisp
+```cl
 > (set `#(ok ,subs) (rcrly:get-subscriptions 123))
 #(ok
   #(subscriptions
@@ -439,11 +546,14 @@ Takes an account id:
     (#(subscription ...))))
 ```
 
+Takes an account id:
+
+
 ### ``get-subscription``
 
-Takes a subscription UUID:
+> Get a particular subscription:
 
-```lisp
+```cl
 > (set uuid "2dbc6c2cb823174353853a409c90d419")
 "2dbc6c2cb823174353853a409c90d419"
 > (set `#(ok ,subs) (rcrly:get-subscription uuid))
@@ -451,28 +561,21 @@ Takes a subscription UUID:
   #(subscription ...))
 ```
 
-Extract data as needed:
+> Extract data as needed:
 
-
-```lisp
+```cl
 > (rcrly:get-in '(subscription current_period_started_at) subs)
 "2015-03-24T21:12:14Z"
 ```
 
+Takes a subscription UUID:
+
+
 ### ``create-subscription``
 
-Takes payload data.
+> To create a subscription, first create your payload:
 
-To use from the REPL, first, pull in the XML macros:
-
-```lisp
-> (slurp "src/rcrly-xml.lfe")
-#(ok rcrly-xml)
-```
-
-Now create your payload:
-
-```lisp
+```cl
 > (set payload
     (xml/subscription
       (list
@@ -480,40 +583,37 @@ Now create your payload:
         (xml/currency "USD")
         (xml/account
           (xml/account_code "123")))))
+```
+```xml
 "<subscription>...</subscription>"
 ```
 
-Now make the API call to create the plan:
+> Now make the API call to create the plan:
 
-```lisp
+```cl
 > (set `#(ok ,subs) (rcrly:create-subscription payload))
 #(ok
   #(subscription ...))
 ```
 
-With the plan created, we can extract data from the results:
+> With the plan created, we can extract data from the results:
 
-```lisp
+```cl
 > (rcrly:get-in '(subscription plan name) subs)
 "Gold plan"
 ```
 
+Takes payload data.
+
 ### ``preview-subscription``
+
+TBD
 
 ### ``update-subscription``
 
-Takes subscription UUID and payload data.
+> To update a subscription, create your payload:
 
-To use from the REPL, first, pull in the XML macros:
-
-```lisp
-> (slurp "src/rcrly-xml.lfe")
-#(ok rcrly-xml)
-```
-
-Now create your payload:
-
-```lisp
+```cl
 > (set uuid "2dbc6c2cb823174353853a409c90d419")
 "2dbc6c2cb823174353853a409c90d419"
 > (set payload
@@ -524,28 +624,33 @@ Now create your payload:
 "<subscription>...</subscription>"
 ```
 
-Now make the API call to create the plan:
+> Now make the API call to create the plan:
 
-```lisp
+```cl
 > (set `#(ok ,subs) (rcrly:update-subscription uuid payload))
 #(ok
   #(subscription ...))
 ```
 
-With the plan created, we can extract data from the results:
+> With the plan created, we can extract data from the results:
 
-```lisp
+```cl
 > (rcrly:get-in '(subscription plan name) subs)
 "Silver plan"
 ```
 
+Takes subscription UUID and payload data.
+
+
 ### ``update-subscription-notes``
+
+TBD
 
 ### ``cancel-subscription``
 
-Takes a subscription UUID:
+> To cancel a subscription:
 
-```lisp
+```cl
 > (set uuid "2dbc6c2cb823174353853a409c90d419")
 "2dbc6c2cb823174353853a409c90d419"
 > (set #(ok ,subs) (rcrly:cancel-subscription uuid))
@@ -553,18 +658,21 @@ Takes a subscription UUID:
   #(subscription ...))
 ```
 
-And you can check the subscription state:
+> And you can check the subscription state:
 
-```lisp
+```cl
 > (rcrly:get-in '(subscription state) subs)
 "canceled"
 ```
 
+Takes a subscription UUID.
+
+
 ### ``reactivate-subscription``
 
-Takes a subscription UUID:
+> To reactivate a subscription:
 
-```lisp
+```cl
 > (set uuid "2dbc6c2cb823174353853a409c90d419")
 "2dbc6c2cb823174353853a409c90d419"
 > (set #(ok ,subs) (rcrly:reactivate-subscription uuid))
@@ -572,18 +680,20 @@ Takes a subscription UUID:
   #(subscription ...))
 ```
 
-Check the subscription state:
+> Check the subscription state:
 
-```lisp
+```cl
 > (rcrly:get-in '(subscription state) subs)
 "active"
 ```
 
+Takes a subscription UUID
+
 ### ``terminate-subscription``
 
-Takes a subscription UUID:
+To terminate a subscription:
 
-```lisp
+```cl
 > (set uuid "2dbc6c2cb823174353853a409c90d419")
 "2dbc6c2cb823174353853a409c90d419"
 > (set #(ok ,subs) (rcrly:terminate-subscription uuid))
@@ -591,12 +701,14 @@ Takes a subscription UUID:
   #(subscription ...))
 ```
 
-Check the subscription state:
+> Check the subscription state:
 
-```lisp
+```cl
 > (rcrly:get-in '(subscription statue) subs)
 "expired"
 ```
+
+Takes a subscription UUID
 
 ### ``postpone-subscription``
 
@@ -606,4 +718,8 @@ Recurly [Transactions documentation](https://docs.recurly.com/api/transactions)
 
 ### ``get-all-transactions``
 
+TBD
+
 ### ``get-transactions``
+
+TBD
